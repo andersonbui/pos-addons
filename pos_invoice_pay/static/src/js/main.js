@@ -1,6 +1,8 @@
 //  Copyright 2018 Artyom Losev
 //  Copyright 2018 Dinar Gabbasov <https://it-projects.info/team/GabbasovDinar>
 //  Copyright 2018 Kolushov Alexandr <https://it-projects.info/team/KolushovAlexandr>
+//  Copyright 2021 Anderson Buitron <https://github.com/andersonbui/>
+
 //  License MIT (https://opensource.org/licenses/MIT).
 /* eslint no-useless-escape: "off"*/
 odoo.define("pos_invoices", function(require) {
@@ -14,6 +16,7 @@ odoo.define("pos_invoices", function(require) {
     var screens = require("point_of_sale.screens");
     var rpc = require("web.rpc");
     var chrome = require("point_of_sale.chrome");
+    var field_utils = require('web.field_utils');
 
     var QWeb = core.qweb;
     var _t = core._t;
@@ -970,7 +973,18 @@ odoo.define("pos_invoices", function(require) {
                 //     case "posted":
                 //         this.gui.show_screen("invoice_payment", {type: "invoices"});
                 // }
-                this.gui.show_screen("invoice_payment", {type: "invoices"});
+                let value = this.pos.selected_invoice.amount_residual;
+
+                this.gui.show_popup('number', {
+                    'title': _t('Select amount'),
+                    'value': this.format_currency_no_symbol(""+field_utils.parse.float(""+value)),
+                    'confirm': function(value) {
+                        this.pos.selected_invoice.amount_residual = field_utils.parse.float(value);
+                        this.pos.selected_invoice.amount_tax = 0.0;
+                        this.pos.selected_invoice.amount_total = field_utils.parse.float(value);
+                        this.gui.show_screen("invoice_payment", { type: "invoices"});
+                    },
+                });
             } else {
                 this.gui.show_popup("error", {
                     title: _t("No invoice"),
