@@ -23,6 +23,8 @@ class PosOrder(models.Model):
     @api.model
     def process_invoice_payment(self, invoice):
         for statement in invoice["data"]["statement_ids"]:
+            if(statement == 0):
+                continue
             inv_id = invoice["data"]["invoice_to_pay"]["id"]
             inv_obj = self.env["account.move"].browse(inv_id)
             payment_method_id = statement[2]["payment_method_id"]
@@ -39,7 +41,7 @@ class PosOrder(models.Model):
 
             vals = {
                 "journal_id": journal.id,
-                "payment_method_id": 1,
+                "payment_method_id": payment_method_id,
                 "payment_date": invoice["data"]["creation_date"],
                 # "communication": invoice["data"]["invoice_to_pay"]["number"],
                 "invoice_ids": [(4, inv_id, None)],
