@@ -22,7 +22,10 @@ class PosOrder(models.Model):
 
         if invoices_to_pay:
             for inv in invoices_to_pay:
-                self.process_invoice_payment(inv)
+                #self.process_invoice_payment(inv)
+                # este pago es una entrada de dinero que deberia registrarse en la caja y no deberia devolverse
+                # el total pagado como estaba originalmente
+                inv['data']['amount_return'] = 0
 
         return res
 
@@ -42,6 +45,9 @@ class PosOrder(models.Model):
         order_ids = []
         for order in orders:
             existing_order = False
+
+            order
+
             if 'server_id' in order['data']:
                 existing_order = self.env['pos.order'].search(['|', ('id', '=', order['data']['server_id']), ('pos_reference', '=', order['data']['name'])], limit=1)
             if (existing_order and existing_order.state == 'draft') or not existing_order:
@@ -85,40 +91,15 @@ class PosOrder(models.Model):
             payment = self.env["account.payment"].create(vals)
             payment.post()
 
-    def _process_order(self, order, draft, existing_order):
-        """Create or update an pos.order from a given dictionary.
+    def action_pos_order_paid(self):
+        self.write({'state': 'paid'})
+        return self.create_picking()
 
-        :param pos_order: dictionary representing the order.
-        :type pos_order: dict.
-        :param draft: Indicate that the pos_order is not validated yet.
-        :type draft: bool.
-        :param existing_order: order to be updated or False.
-        :type existing_order: pos.order.
-        :returns number pos_order id
-        """
-        order = order['data']
-        pos_session = self.env['pos.session'].browse(order['pos_session_id'])
-        if pos_session.state == 'closing_control' or pos_session.state == 'closed':
-            order['pos_session_id'] = self._get_valid_session(order).id
-
-        pos_order = False
-        if not existing_order:
-            pos_order = self.create(self._order_fields(order))
-        else:
-            pos_order = existing_order
-            pos_order.lines.unlink()
-            order['user_id'] = pos_order.user_id.id
-            pos_order.write(self._order_fields(order))
-
-        self._process_payment_lines(order, pos_order, pos_session, draft)
-
-        if not draft:
-            pos_order.action_pos_order_paid()
-
-        if pos_order.to_invoice and pos_order.state == 'paid':
-            pos_order.action_pos_order_invoice()
-
-        return pos_order.id
+    def write(self, vals):
+        for order in self:
+            if vals.get('state') and vals['state'] == 'paid' and order.name == '/':
+                vals['name'] = order.config_id.sequence_id._next()
+        return super(PosOrder, self).write(vals)
 
     def _process_payment_lines(self, pos_order, order, pos_session, draft):
         """Create account.bank.statement.lines from the dictionary given to the parent function.
@@ -135,7 +116,7 @@ class PosOrder(models.Model):
         :type draft: bool.
         """
         prec_acc = order.pricelist_id.currency_id.decimal_places
-        self.write({'state': 'paid'})
+        #self.write({'state': 'paid'})
 
         order_bank_statement_lines = self.env['pos.payment'].search([('pos_order_id', '=', order.id)])
         order_bank_statement_lines.unlink()
