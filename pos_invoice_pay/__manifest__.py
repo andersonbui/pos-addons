@@ -1,18 +1,18 @@
 # Copyright 2018 Artyom Losev
 # Copyright 2018 Dinar Gabbasov <https://it-projects.info/team/GabbasovDinar>
+# Copyright 2021 Ilya Ilchenko <https://github.com/mentalko>
 # License MIT (https://opensource.org/licenses/MIT).
 {
     "name": """POS: Pay SO & Invoices""",
     "summary": """Handle the payment process for Sale Orders/Invoices over Point of Sale""",
     "category": "Point of Sale",
     "images": ["images/pos_invoice_pay_main.png"],
-    "version": "13.0.1.2.5",
+    "version": "13.0.1.2.6",
     "application": False,
     "author": "IT-Projects LLC, Artyom Losev",
     "support": "apps@itpp.dev",
     "website": "https://apps.odoo.com/apps/modules/13.0/pos_invoice_pay/",
     "license": "Other OSI approved licence",  # MIT
-    "price": 89.00,
     "currency": "EUR",
     "depends": ["base_automation", "sale_management", "pos_longpolling"],
     "external_dependencies": {"python": [], "bin": []},

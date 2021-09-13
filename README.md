@@ -1,9 +1,12 @@
 [![help@itpp.dev](https://itpp.dev/images/infinity-readme.png)](mailto:help@itpp.dev)
 # [13.0] Odoo POS Addons 
 
+:open_file_folder: Get a **.zip** file with all needed dependencies:
+
 :heavy_check_mark: [pos_cashier_select](https://apps.odoo.com/apps/modules/13.0/pos_cashier_select/)
 <br/>:heavy_check_mark: [pos_debranding](https://apps.odoo.com/apps/modules/13.0/pos_debranding/)
 <br/>:heavy_check_mark: [pos_debt_notebook](https://apps.odoo.com/apps/modules/13.0/pos_debt_notebook/)
+<br/>:heavy_check_mark: [pos_debt_notebook_sync](https://apps.odoo.com/apps/modules/13.0/pos_debt_notebook_sync/)
 <br/>:heavy_check_mark: [pos_discount_total](https://apps.odoo.com/apps/modules/13.0/pos_discount_total/)
 <br/>:heavy_check_mark: [pos_invoice_pay](https://apps.odoo.com/apps/modules/13.0/pos_invoice_pay/)
 <br/>:heavy_check_mark: [pos_keyboard](https://apps.odoo.com/apps/modules/13.0/pos_keyboard/)
@@ -14,10 +17,15 @@
 <br/>:heavy_check_mark: [pos_order_note](https://apps.odoo.com/apps/modules/13.0/pos_order_note/)
 <br/>:heavy_check_mark: [pos_orderline_absolute_discount](https://apps.odoo.com/apps/modules/13.0/pos_orderline_absolute_discount/)
 <br/>:heavy_check_mark: [pos_orders_history](https://apps.odoo.com/apps/modules/13.0/pos_orders_history/)
+<br/>:heavy_check_mark: [pos_partner_sync](https://apps.odoo.com/apps/modules/13.0/pos_partner_sync/)
 <br/>:heavy_check_mark: [pos_pin](https://apps.odoo.com/apps/modules/13.0/pos_pin/)
 <br/>:heavy_check_mark: [pos_product_available](https://apps.odoo.com/apps/modules/13.0/pos_product_available/)
 <br/>:heavy_check_mark: [pos_restaurant_base](https://apps.odoo.com/apps/modules/13.0/pos_restaurant_base/)
 <br/>:heavy_check_mark: [pos_scan_ref](https://apps.odoo.com/apps/modules/13.0/pos_scan_ref/)
+
+:star: Star this repo if you **like** it!
+
+:heart: [Sponsor us](https://patreon.com/itpp) if you **love** it!
 
 Other Addons
 ============
