@@ -1235,6 +1235,7 @@ odoo.define("pos_invoices", function (require) {
         },
         click_next: function () {
             this.gui.show_screen("products");
+            this._super();
         },
     });
 

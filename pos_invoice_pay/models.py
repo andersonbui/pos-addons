@@ -49,7 +49,9 @@ class PosOrder(models.Model):
             order
 
             if 'server_id' in order['data']:
-                existing_order = self.env['pos.order'].search(['|', ('id', '=', order['data']['server_id']), ('pos_reference', '=', order['data']['name'])], limit=1)
+                order_server_id = order['data']['server_id']
+                order_name = order['data']['name']
+                existing_order = self.env['pos.order'].search(['|', ('id', '=', order_server_id), ('pos_reference', '=', order_name)], limit=1)
             if (existing_order and existing_order.state == 'draft') or not existing_order:
                 order_ids.append(self._process_order(order, draft, existing_order))
 
@@ -101,6 +103,12 @@ class PosOrder(models.Model):
                 vals['name'] = order.config_id.sequence_id._next()
         return super(PosOrder, self).write(vals)
 
+
+    def action_pos_order_paid(self):
+        self.write({'state': 'paid'})
+        return self.create_picking()
+
+
     def _process_payment_lines(self, pos_order, order, pos_session, draft):
         """Create account.bank.statement.lines from the dictionary given to the parent function.
 
@@ -121,10 +129,13 @@ class PosOrder(models.Model):
         order_bank_statement_lines = self.env['pos.payment'].search([('pos_order_id', '=', order.id)])
         order_bank_statement_lines.unlink()
         for payments in pos_order['statement_ids']:
-            if not float_is_zero(payments[2]['amount'], precision_digits=prec_acc):
-                order.add_payment(self._payment_fields(order, payments[2]))
+            payamount = payments[2]['amount']
+            if not float_is_zero(payamount, precision_digits=prec_acc):
+                paymentfields = self._payment_fields(order, payments[2])
+                order.add_payment(paymentfields)
 
         order.amount_paid = sum(order.payment_ids.mapped('amount'))
+        pass
 
     @api.model
     def process_invoices_creation(self, sale_order_id):
