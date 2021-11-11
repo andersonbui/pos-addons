@@ -15,6 +15,7 @@ globals:
   odoo: readonly
   openerp: readonly
   Promise: readonly
+  owl: readonly
 
 # Styling is handled by Prettier, so we only need to enable AST rules;
 # see https://github.com/OCA/maintainer-quality-tools/pull/618#issuecomment-558576890
@@ -101,6 +102,7 @@ rules:
   no-obj-calls: warn
   no-octal-escape: warn
   no-octal: warn
+  no-param-reassign: off
   no-path-concat: warn
   no-process-env: warn
   no-process-exit: warn
