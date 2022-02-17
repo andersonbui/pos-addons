@@ -355,9 +355,7 @@
                                 </td>
                                 <t t-if='order.get_change(line)'>
                                     <td class='col-change highlight'>
-                                        <t
-                                            t-esc='widget.format_currency_no_symbol(order.invoice_to_pay.get_change(line))'
-                                        />
+                                        <t t-esc='widget.format_currency_no_symbol(order.invoice_to_pay.get_change(line))'  />
                                     </td>
                                 </t>
                                 <t t-if='!order.get_change(line)'>

@@ -1,8 +1,15 @@
 # Copyright 2017 Artyom Losev
 # Copyright 2018 Kolushov Alexandr <https://it-projects.info/team/KolushovAlexandr>
 # License MIT (https://opensource.org/licenses/MIT).
-from odoo import _, api, fields, models
-from odoo.tools import float_is_zero
+
+from functools import reduce
+import psycopg2
+import logging
+from odoo import _, api, fields, models, tools
+from odoo.tools import float_is_zero, float_round
+from odoo.exceptions import ValidationError, UserError
+
+_logger = logging.getLogger(__name__)
 
 SO_CHANNEL = "pos_sale_orders"
 INV_CHANNEL = "pos_invoices"
@@ -17,15 +24,8 @@ class PosOrder(models.Model):
         original_orders = [o for o in orders if o not in invoices_to_pay]
 
         res = super(PosOrder, self).create_from_ui(original_orders, draft=draft)
-
-        self.create_from_ui_aux(invoices_to_pay, draft=draft)
-
         if invoices_to_pay:
-            for inv in invoices_to_pay:
-                #self.process_invoice_payment(inv)
-                # este pago es una entrada de dinero que deberia registrarse en la caja y no deberia devolverse
-                # el total pagado como estaba originalmente
-                inv['data']['amount_return'] = 0
+            self.create_from_ui_aux(invoices_to_pay, draft=draft)
 
         return res
 
@@ -45,103 +45,118 @@ class PosOrder(models.Model):
         order_ids = []
         for order in orders:
             existing_order = False
-
-            order
-
             if 'server_id' in order['data']:
-                order_server_id = order['data']['server_id']
-                order_name = order['data']['name']
-                existing_order = self.env['pos.order'].search(['|', ('id', '=', order_server_id), ('pos_reference', '=', order_name)], limit=1)
+                existing_order = self.env['pos.order'].search(
+                    ['|', ('id', '=', order['data']['server_id']), ('pos_reference', '=', order['data']['name'])],
+                    limit=1)
+            order_aux = order['data']
+            # statement_ids = order["statement_ids"]
+            invoice_to_pay = order_aux["invoice_to_pay"]
+            # original_order = self.env['pos.order'].search([('account_move', '=', invoice_to_pay["id"])])
+            # total_pay = reduce(lambda x, y: x + y, [x[2]["amount"] for x in statement_ids])
+            total_pay = invoice_to_pay['amount_residual']
+            order_aux['amount_total'] = total_pay
+            order_aux['amount_paid'] = total_pay
+            order_aux['amount_return'] = order_aux['amount_return'] - total_pay
+            order_aux['account_move'] = invoice_to_pay["id"]
+            order_aux['state'] = "invoiced"
+            order_aux["partner_id"] = invoice_to_pay['partner_id'][0]
             if (existing_order and existing_order.state == 'draft') or not existing_order:
-                order_ids.append(self._process_order(order, draft, existing_order))
+                order_id = self._process_order_aux(order, draft, existing_order)
+                # original_order = self.env['pos.order'].search([('id', '=', order_id)])                existing_order = existing_order[0]
+                # order._apply_invoice_payments()
+                order_ids.append(order_id)
 
+        return self.env['pos.order'].search_read(domain=[('id', 'in', order_ids)], fields = ['id', 'pos_reference'])
 
-    def process_invoice_payment(self, invoice):
-        for statement in invoice["data"]["statement_ids"]:
-            if(statement == 0):
-                continue
-            inv_id = invoice["data"]["invoice_to_pay"]["id"]
-            inv_obj = self.env["account.move"].browse(inv_id)
-            payment_method_id = statement[2]["payment_method_id"]
-            journal = self.env["pos.payment.method"].browse(payment_method_id)
-            amount = min(
-                statement[2]["amount"],  # amount payed including change
-                invoice["data"]["invoice_to_pay"][
-                    "amount_residual"
-                ],  # amount required to pay
-            )
-            cashier = invoice["data"]["user_id"]
-            writeoff_acc_id = False
-            payment_difference_handling = "open"
+    def _process_order_aux(self, order, draft, existing_order):
+        """Create or update an pos.order from a given dictionary.
 
-            vals = {
-                "journal_id": journal.id,
-                "payment_method_id": payment_method_id,
-                "payment_date": invoice["data"]["creation_date"],
-                # "communication": invoice["data"]["invoice_to_pay"]["number"],
-                "invoice_ids": [(4, inv_id, None)],
-                "payment_type": "inbound",
-                "amount": amount,
-                "currency_id": inv_obj.currency_id.id,
-                "partner_id": invoice["data"]["invoice_to_pay"]["partner_id"][0],
-                "partner_type": "customer",
-                "payment_difference_handling": payment_difference_handling,
-                "writeoff_account_id": writeoff_acc_id,
-                "pos_session_id": invoice["data"]["pos_session_id"],
-                "cashier": cashier,
-            }
-            payment = self.env["account.payment"].create(vals)
-            payment.post()
-
-    def action_pos_order_paid(self):
-        self.write({'state': 'paid'})
-        return self.create_picking()
-
-    def write(self, vals):
-        for order in self:
-            if vals.get('state') and vals['state'] == 'paid' and order.name == '/':
-                vals['name'] = order.config_id.sequence_id._next()
-        return super(PosOrder, self).write(vals)
-
-
-    def action_pos_order_paid(self):
-        self.write({'state': 'paid'})
-        return self.create_picking()
-
-
-    def _process_payment_lines(self, pos_order, order, pos_session, draft):
-        """Create account.bank.statement.lines from the dictionary given to the parent function.
-
-        If the payment_line is an updated version of an existing one, the existing payment_line will first be
-        removed before making a new one.
         :param pos_order: dictionary representing the order.
         :type pos_order: dict.
-        :param order: Order object the payment lines should belong to.
-        :type order: pos.order
-        :param pos_session: PoS session the order was created in.
-        :type pos_session: pos.session
         :param draft: Indicate that the pos_order is not validated yet.
         :type draft: bool.
+        :param existing_order: order to be updated or False.
+        :type existing_order: pos.order.
+        :returns number pos_order id
         """
-        prec_acc = order.pricelist_id.currency_id.decimal_places
-        #self.write({'state': 'paid'})
+        order = order['data']
+        pos_session = self.env['pos.session'].browse(order['pos_session_id'])
+        if pos_session.state == 'closing_control' or pos_session.state == 'closed':
+            order['pos_session_id'] = self._get_valid_session(order).id
 
-        order_bank_statement_lines = self.env['pos.payment'].search([('pos_order_id', '=', order.id)])
-        order_bank_statement_lines.unlink()
-        for payments in pos_order['statement_ids']:
-            payamount = payments[2]['amount']
-            if not float_is_zero(payamount, precision_digits=prec_acc):
-                paymentfields = self._payment_fields(order, payments[2])
-                order.add_payment(paymentfields)
+        pos_order = False
+        if not existing_order:
+            pos_order = self.create(self._order_fields(order))
+        else:
+            pos_order = existing_order
+            pos_order.lines.unlink()
+            order['user_id'] = pos_order.user_id.id
+            pos_order.write(self._order_fields(order))
 
-        order.amount_paid = sum(order.payment_ids.mapped('amount'))
-        pass
+        pos_order = pos_order.with_company(pos_order.company_id)
+        self = self.with_company(pos_order.company_id)
+        self._process_payment_lines(order, pos_order, pos_session, draft)
+
+        if not draft:
+            try:
+                pos_order.action_pos_order_paid()
+            except psycopg2.DatabaseError:
+                # do not hide transactional errors, the order(s) won't be saved!
+                raise
+            except Exception as e:
+                _logger.error('Could not fully process the POS Order: %s', tools.ustr(e))
+            # pos_order._create_order_picking()
+            # pos_order._compute_total_cost_in_real_time()
+
+        if pos_order.state == 'paid':
+            pos_order.action_pos_order_invoice_aux(order)
+
+        return pos_order.id
+
+    def action_pos_order_invoice_aux(self, order_pos):
+        moves = self.env['account.move']
+
+        for order in self:
+            # Force company for all SUPERUSER_ID action
+            if order.account_move:
+                moves += order.account_move
+                continue
+
+            if not order.partner_id:
+                raise UserError(_('Please provide a partner for the sale.'))
+            # obtener invoice desde la orden de compra
+            invoice_to_pay = order_pos["invoice_to_pay"]
+            a_move = self.env["account.move"].browse(invoice_to_pay["id"])
+
+            order.write({'account_move': a_move.id, 'state': 'invoiced'})
+            if a_move.state == 'draft':
+                a_move.sudo().with_context(force_company=order.company_id.id).post() # factura ya publicada
+            moves += a_move
+            order._apply_invoice_payments()
+
+        if not moves:
+            return {}
+
+        return {
+            'name': _('Customer Invoice'),
+            'view_mode': 'form',
+            'view_id': self.env.ref('account.view_move_form').id,
+            'res_model': 'account.move',
+            'context': "{'type':'out_invoice'}",
+            'type': 'ir.actions.act_window',
+            'nodestroy': True,
+            'target': 'current',
+            'res_id': moves and moves.ids[0] or False,
+        }
 
     @api.model
     def process_invoices_creation(self, sale_order_id):
         order = self.env["sale.order"].browse(sale_order_id)
         inv_id = order._create_invoices(final=True)
-        inv_id.action_post()
+        if inv_id.state == 'draft': # factura sin publicar publicada
+            inv_id.sudo().with_context(force_company=order.company_id.id).action_post()
+            # inv_id.sudo().with_context(force_company=order.company_id.id).post()
         return inv_id.id
 
 

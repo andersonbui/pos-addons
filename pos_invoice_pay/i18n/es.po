@@ -41,7 +41,7 @@ msgstr ""
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:70
 #, python-format
 msgid "Account"
-msgstr ""
+msgstr "Cuenta"
 
 #. module: pos_invoice_pay
 #. openerp-web
@@ -55,12 +55,12 @@ msgstr "Monto"
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:191
 #, python-format
 msgid "Amount Due"
-msgstr ""
+msgstr "Monto adeudado"
 
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.pos_invoice_pay_report
 msgid "Amount Total"
-msgstr ""
+msgstr "Monto total"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,help:pos_invoice_pay.field_pos_config__invoice_cashier_selection
@@ -77,7 +77,7 @@ msgstr ""
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:212
 #, python-format
 msgid "Back"
-msgstr ""
+msgstr "Atras"
 
 #. module: pos_invoice_pay
 #. openerp-web
@@ -98,7 +98,7 @@ msgstr "Cancelar"
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_account_payment__cashier
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.pos_invoice_pay_report
 msgid "Cashier"
-msgstr ""
+msgstr "Cajero"
 
 #. module: pos_invoice_pay
 #. openerp-web
@@ -122,7 +122,7 @@ msgstr "Cambiar Cajero"
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:531
 #, python-format
 msgid "Change:"
-msgstr ""
+msgstr "Cambio"
 
 #. module: pos_invoice_pay
 #. openerp-web
@@ -136,7 +136,7 @@ msgstr ""
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:110
 #, python-format
 msgid "Create Invoice"
-msgstr ""
+msgstr "Crear Factura"
 
 #. module: pos_invoice_pay
 #. openerp-web
@@ -152,7 +152,7 @@ msgstr "Cliente"
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:124
 #, python-format
 msgid "Date"
-msgstr ""
+msgstr "Fecha"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_account_payment__datetime
@@ -164,7 +164,7 @@ msgstr ""
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:37
 #, python-format
 msgid "Delivered"
-msgstr ""
+msgstr "Entregado"
 
 #. module: pos_invoice_pay
 #. openerp-web
@@ -172,7 +172,7 @@ msgstr ""
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:69
 #, python-format
 msgid "Description"
-msgstr ""
+msgstr "Descripcion"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_pos_config__pos_invoice_pay_writeoff_account_id
@@ -185,21 +185,21 @@ msgstr ""
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:74
 #, python-format
 msgid "Discount(%)"
-msgstr ""
+msgstr "Descuento(%)"
 
 #. module: pos_invoice_pay
 #. openerp-web
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:282
 #, python-format
 msgid "Due"
-msgstr ""
+msgstr "Deuda"
 
 #. module: pos_invoice_pay
 #. openerp-web
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:189
 #, python-format
 msgid "Due Date"
-msgstr ""
+msgstr "Fecha deuda"
 
 #. module: pos_invoice_pay
 #. openerp-web
