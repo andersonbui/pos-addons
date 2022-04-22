@@ -1,0 +1,33 @@
+# Copyright 2022 Anderson Buitron <https://github.com/abuitron>
+# License MIT (https://opensource.org/licenses/MIT).
+{
+    "name": """POS Credit""",
+    "summary": """Pay with credit on Invoices at Point of Sale""",
+    "category": "Point of Sale",
+    "images": ["images/pos_credit_invoice_main.png"],
+    "version": "13.0.0.0",
+    "application": False,
+    "author": "OCA ",
+    "website": "https://github.com/andersonbui/pos-addons",
+    "license": "Other OSI approved licence", 
+    "depends": ["sale_management", "pos_longpolling"],
+    "external_dependencies": {"python": [], "bin": []},
+    "data": [
+        "views/assets.xml",
+        # "report/report.xml",
+        # "views/view.xml",
+    ],
+    "qweb": ["static/src/xml/pos.xml"],
+    "demo": [],
+    "post_load": None,
+    "pre_init_hook": None,
+    "post_init_hook": None,
+    "auto_install": False,
+    "installable": True,
+    "demo_title": "Credit over POS Invoices",
+    "demo_addons": [],
+    "demo_addons_hidden": [],
+    "demo_url": "pos-invoice-credit",
+    "demo_summary": "Handle the payment process for Sale Orders/Invoices over Point of Sale",
+    "demo_images": ["images/pos_credit_invoice_main.png"],
+}
