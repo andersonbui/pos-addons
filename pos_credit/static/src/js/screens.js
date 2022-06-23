@@ -1,14 +1,13 @@
 odoo.define('point_of_sale_screens', function (require) {
     "use strict";
 
+    var screens = require('point_of_sale.screens');
     var core = require('web.core');
     var utils = require('web.utils');
 
     var _t = core._t;
 
-    var PaymentScreenWidget = ScreenWidget.extend({
-        template: 'PaymentScreenWidget',
-        back_screen: 'product',
+    screens.PaymentScreenWidget.include({
 
         order_is_valid: function (force_validation) {
             var self = this;
@@ -44,7 +43,7 @@ odoo.define('point_of_sale_screens', function (require) {
             var forcevalid = force_validation
             var totalwithtax = order.get_total_with_tax()
             // if the change is too large, it's probably an input error, make the user confirm.
-            if (forcevalid === 'Confirm Large Amount' && totalwithtax > 0 && (totalwithtax * 250 < order.get_total_paid())) {
+            if (forcevalid != 'Confirm Large Amount' && totalwithtax > 0 && (totalwithtax * 250 < order.get_total_paid())) {
                 this.gui.show_popup('confirm', {
                     title: _t('Please Confirm Large Amount'),
                     body: _t('Are you sure that the customer wants to  pay') +
@@ -100,25 +99,6 @@ odoo.define('point_of_sale_screens', function (require) {
                 return false;
             }
 
-            // if the change is too large, it's probably an input error, make the user confirm.
-            if (!force_validation && order.get_total_with_tax() > 0 && (order.get_total_with_tax() * 1000 < order.get_total_paid())) {
-                this.gui.show_popup('confirm', {
-                    title: _t('Please Confirm Large Amount'),
-                    body: _t('Are you sure that the customer wants to  pay') +
-                        ' ' +
-                        this.format_currency(order.get_total_paid()) +
-                        ' ' +
-                        _t('for an order of') +
-                        ' ' +
-                        this.format_currency(order.get_total_with_tax()) +
-                        ' ' +
-                        _t('? Clicking "Confirm" will validate the payment.'),
-                    confirm: function () {
-                        self.validate_order('confirm');
-                    },
-                });
-                return false;
-            }
             return true;
         },
 
@@ -197,7 +177,8 @@ odoo.define('point_of_sale_screens', function (require) {
                 var order = this.pos.get_order();
                 var paymentlines = order.get_paymentlines()
                 for (let line of paymentlines) {
-                    if (!line.is_done()) order.remove_paymentline(line);
+                    let is_done =  line.get_payment_status() ? line.get_payment_status() === 'done' || line.get_payment_status() === 'reversed': true;
+                    if (!is_done) order.remove_paymentline(line);
                 }
                 this.finalize_validation();
             }
@@ -208,10 +189,5 @@ odoo.define('point_of_sale_screens', function (require) {
         },
 
     });
-
-    return {
-        PaymentScreenWidget: PaymentScreenWidget,
-  
-    };
 
 });

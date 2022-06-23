@@ -1,8 +1,8 @@
-odoo.define('point_of_sale_models', function(require){
+odoo.define('point_of_sale.pos_credit', function(require){
     "use strict";
-    //var pos_models = require('point_of_sale.models');
+    var models = require('point_of_sale.models');
     //exports.PosModel = Backbone.Model.extend({
-    var models = require('point_of_sale_models');
+    //var models = pos_models.PosModels.prototype.models;
     models.PosModels = models.PosModels.extend({
 
         models: [
@@ -38,9 +38,10 @@ odoo.define('point_of_sale_models', function(require){
     });
 
 
-// Every Paymentline contains a cashregister and an amount of money.
-    exports.Paymentline = Paymentline.Model.extend({
-        /**
+    // Every Paymentline contains a cashregister and an amount of money.
+    models.Paymentline = models.Paymentline.extend({
+    
+    /**
      * Check if paymentline is done.
      * Paymentline is done if there is no payment status or the payment status is done.
      */
