@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--Copyright 2017 Ivan Yelizariev <https://it-projects.info/team/yelizariev>
+    Copyright 2017 Artyom Losev <https://github.com/ArtyomLosev>
+    Copyright 2017 Dinar Gabbasov <https://it-projects.info/team/GabbasovDinar>
+    Copyright 2018 Kolushov Alexandr <https://it-projects.info/team/KolushovAlexandr>
+    Copyright 2020 Almas Giniatullin <https://it-projects.info/team/almas50>
+    License MIT (https://opensource.org/licenses/MIT). -->
+<odoo>
+    <record model="ir.ui.view" id="pos_payment_method_view_form_inherit_pos_credit">
+        <field name="name">pos.payment.method.form.inherit</field>
+        <field name="model">pos.payment.method</field>
+        <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_form" />
+        <field name="arch" type="xml">
+
+            <xpath expr="//form/sheet" position="inside">
+                <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                <field name="active" invisible="1"/>
+                <field name="type" invisible="1" />
+            </xpath>
+            
+            <xpath expr="//form/sheet/div/label" position="replace">
+                <label for="name"/>
+            </xpath> 
+
+            <xpath expr="//field[@name='receivable_account_id']" position="attributes">
+                <!-- <field name="receivable_account_id" groups="account.group_account_user" attrs="{'invisible': [('split_transactions', '=', True)]}"/> -->
+                <attribute name="attrs">{'invisible': [('split_transactions', '=', True)]}</attribute>
+            </xpath>
+            
+            <xpath expr="//field[@name='cash_journal_id']" position="attributes">
+                <!-- <field name="receivable_account_id" groups="account.group_account_user" attrs="{'invisible': [('split_transactions', '=', True)]}"/> -->
+                <attribute name="attrs">{ 'required': [('split_transactions', '=', False)]}</attribute>
+            </xpath>
+              
+            <xpath expr="//form/sheet/group[@name='Payment methods']" position="inside">
+                
+                <group>                                        
+                    <field name="split_transactions" groups="base.group_account_user" />                                
+                </group> 
+                                            
+                <group attrs="{'invisible': ['|', ('hide_use_payment_terminal', '=', False), ('type', 'in', ['cash', 'pay_later'])]}">
+                    <div>
+                        <h2>Tips:</h2>
+                        <p>
+                            Go to <a href="#"  type="action" class="btn-link o_form_uri" role="button">Configurations > Settings</a>
+                            <strong> > Payment Terminals</strong>
+                            in order to install a Payment Terminal and make a fully integrated payment method.
+                        </p>
+                    </div>
+                </group>
+                
+                <group attrs="{'invisible': [('hide_use_payment_terminal', '=', True)]}" >
+                     <field name="use_payment_terminal"/>
+                </group>
+                
+            </xpath>
+                        
+            <xpath expr="//field[@name='is_cash_count']" position="replace" >
+            </xpath>
+            
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="pos_payment_method_view_tree_inherit_pos_credit">
+        <field name="name">pos.payment.method.tree.inherit</field>
+        <field name="model">pos.payment.method</field>
+        <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="type" invisible="1"/>
+                <field name="split_transactions" groups="base.group_no_one" />
+                <field name="cash_journal_id" attrs="{'required': [('split_transactions', '=', False)]}" />
+                <field name="outstanding_account_id" groups="account.group_account_readonly" optional="hide" attrs="{'invisible': [('type', '!=', 'bank')]}" />
+                <field name="receivable_account_id" groups="account.group_account_readonly"  optional="hide" attrs="{'invisible': [('split_transactions', '=', True)]}" />
+            </xpath>
+          
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="pos_payment_method_view_search_inherit_pos_credit">
+        <field name="name">pos.payment.search.view.inherit</field>
+        <field name="model">pos.payment.method</field>
+        <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter string="Archived" name="active" domain="[('active', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
