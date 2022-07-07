@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import fields, models, api
+from odoo.tools import float_is_zero
 
 
 class AccountMove(models.Model):
@@ -43,10 +44,27 @@ class AccountMove(models.Model):
 
 
     def _compute_amount(self):
-        super(AccountMove, self)._compute_amount()
-        for inv in self:
+        super(AccountMove, self)._compute_amount()        
+        for inv in self:            
             if inv.type in ['out_invoice', 'out_refund'] and inv.pos_order_ids and any(s != 'closed' for s in inv.pos_order_ids.mapped('session_id.state')):
-                inv.invoice_payment_state = 'not_paid'
+                amount = 0 
+                rounding = 0.0
+                amountTotal = 0
+                for order in inv.pos_order_ids:     
+                    ids_payments = order.payment_ids.filtered(
+                        lambda record: record.payment_method_id.type != 'pay_later'
+                    )               
+                    amount += sum(ids_payments.mapped('amount'))
+                    rounding = order.currency_id.rounding
+                    amountTotal = order.amount_total
+                    #amountTotal = ids_payments.amount_total
+                                    
+                isPaid = float_is_zero(amountTotal - amount, rounding)
+                if isPaid:
+                    inv.invoice_payment_state = 'paid'
+                
+                else:
+                    inv.invoice_payment_state = 'not_paid'
 
     def with_company(self, company):
         """ with_company(company)
