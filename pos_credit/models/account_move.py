@@ -50,16 +50,13 @@ class AccountMove(models.Model):
                 amount = 0 
                 rounding = 0.0
                 amountTotal = 0
-                for order in inv.pos_order_ids:     
-                    ids_payments = order.payment_ids.filtered(
-                        lambda record: record.payment_method_id.type != 'pay_later'
-                    )               
-                    amount += sum(ids_payments.mapped('amount'))
-                    rounding = order.currency_id.rounding
-                    amountTotal = order.amount_total
-                    #amountTotal = ids_payments.amount_total
-                                    
-                isPaid = float_is_zero(amountTotal - amount, rounding)
+                amountResidual = 0
+            
+                rounding = inv.pos_order_ids.currency_id.rounding
+                amountResidual = inv.amount_residual
+                amountTotal = inv.amount_total
+
+                isPaid = float_is_zero(amountResidual, rounding)
                 if isPaid:
                     inv.invoice_payment_state = 'paid'
                 
