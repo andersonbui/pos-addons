@@ -489,7 +489,7 @@ odoo.define("pos_invoices", function (require) {
 
         update_invoice_db: function (updated_invoice) {
             for (var i = 0; i < this.invoices.length; i++) {
-                if (this.invoices[i].id === updated_invoice.id) {
+                if (updated_invoice && this.invoices[i].id === updated_invoice.id) {
                     this.invoices.splice(i, 1);
                     break;
                 }
@@ -941,6 +941,8 @@ odoo.define("pos_invoices", function (require) {
         click_next: function () {
             if (this.selected_invoice) {
                 this.pos.selected_invoice = this.selected_invoice;
+                //  TODO: aqui validar factura antes de asociar pago
+
                 // Switch (this.selected_invoice.state) {
                 //     case "draft":
                 //         this.pos
@@ -971,16 +973,31 @@ odoo.define("pos_invoices", function (require) {
                 //     case "posted":
                 //         this.gui.show_screen("invoice_payment", {type: "invoices"});
                 // }
+                let valuePos = this.pos.selected_invoice.amount_residual
                 let value = this.pos.selected_invoice.amount_residual;
-
+                // reemplazar puntos (.) por comas (,)
+                value = value.toString().replace(/\./g, ",");
                 this.gui.show_popup('number', {
-                    'title': _t('Select amount'),
-                    'value': this.format_currency_no_symbol(""+field_utils.parse.float(""+value)),
+                    // 'title': _t('Select amount'),
+                    'title': _t('Seleccionar Cantidad'),
+                    'value': this.format_currency_no_symbol(""+value),
                     'confirm': function(value) {
-                        this.pos.selected_invoice.amount_residual = field_utils.parse.float(value);
-                        this.pos.selected_invoice.amount_tax = 0.0;
-                        this.pos.selected_invoice.amount_total = field_utils.parse.float(value);
-                        this.gui.show_screen("invoice_payment", { type: "invoices"});
+                        var valuePay = parseInt(value)
+                        if(valuePay > valuePos){
+                            this.gui.show_popup("error",{
+                                // title: _t("Rectify payment"),
+                                // body: _t("The value paid is greater than the value owed."),
+                                title: _t("Rectificar Pago"),
+                                body: _t("El valor a PAGAR es MAYOR que el valor ADEUDADO."),
+                            });
+                        }
+                        else{
+                            this.pos.selected_invoice = JSON.parse(JSON.stringify(this.pos.selected_invoice))
+                            this.pos.selected_invoice.amount_residual = field_utils.parse.float(value);
+                            this.pos.selected_invoice.amount_tax = 0.0;
+                            this.pos.selected_invoice.amount_total = field_utils.parse.float(value);
+                            this.gui.show_screen("invoice_payment", { type: "invoices"});
+                        }                        
                     },
                 });
             } else {
@@ -1128,6 +1145,7 @@ odoo.define("pos_invoices", function (require) {
 
         validate_order: function (force_validation) {
             var order = this.pos.get_order();
+            var invoice_payment  = this.pos.selected_invoice
             if (
                 !this.pos.config.pos_invoice_pay_writeoff_account_id &&
                 order.invoice_to_pay &&
@@ -1140,6 +1158,18 @@ odoo.define("pos_invoices", function (require) {
                     ),
                 });
                 return;
+            }
+            var paymentlines = order.get_paymentlines()
+            var splitPayments = paymentlines.filter(payment => payment.payment_method.split_transactions)
+
+            if ( splitPayments.length ) {
+                var title = _t('Please select the diferent Pyment Method');
+                var description = _t('Para realizar pagos usted necesita seleccionar un metodo de pago que NO sea de Credito.');
+                this.gui.show_popup('error', {
+                    'title': title,
+                    'body': description
+                });
+                return false;
             }
             this._super();
         },

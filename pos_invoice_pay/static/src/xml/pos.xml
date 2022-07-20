@@ -266,7 +266,8 @@
                         <i class='fa fa-angle-double-left' />
                         Back
                     </span>
-                    <h1>Invoice Payment</h1>
+                    <!-- <h1><span>Invoice Payment</span></h1> -->
+                    <h1><span>Pago de Factura</span></h1>
                     <span class='button next'>
                         Validate
                         <i class='fa fa-angle-double-right' />
@@ -286,14 +287,14 @@
                     </section>
                     <div class='payment-buttons'>
                         <t t-if='widget.pos.config.module_account'>
-                            <t t-if='widget.pos.get_order()'>
-                                <div
-                                    t-attf-class='button js_invoice #{ widget.pos.get_order().is_to_invoice() ? "highlight" : ""} '
-                                >
-                                    <i class='fa fa-file-text-o' />
-                                    Invoice
-                                </div>
-                            </t>
+<!--                            <t t-if='widget.pos.get_order()'>-->
+<!--                                <div-->
+<!--                                    t-attf-class='button js_invoice #{ widget.pos.get_order().is_to_invoice() ? "highlight" : ""} '-->
+<!--                                >-->
+<!--                                    <i class='fa fa-file-text-o' />-->
+<!--                                    Invoice-->
+<!--                                </div>-->
+<!--                            </t>-->
                         </t>
                         <t t-if='widget.pos.config.tip_product_id'>
                             <div class='button js_tip'>
