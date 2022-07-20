@@ -6,4 +6,5 @@ from . import pos_session
 from . import stock_picking
 from . import pos_payment
 from . import pos_config
-#from . import base_model
+from . import company
+from . import account_payment

@@ -31,6 +31,16 @@ class PosPaymentMethod(models.Model):
     
     active = fields.Boolean(default=True)
     type = fields.Selection(selection=[('cash', 'Cash'), ('bank', 'Bank'), ('pay_later', 'Customer Account')], compute="_compute_type")
+
+    # journal_id = fields.Many2one('account.journal',
+    #     string='Journal',
+    #     domain=[('type', 'in', ('cash', 'bank'))],
+    #     ondelete='restrict',
+    #     help='Leave empty to use the receivable account of customer.\n'
+    #          'Defines the journal where to book the accumulated payments (or individual payment if Identify Customer is true) after closing the session.\n'
+    #          'For cash journal, we directly write to the default account in the journal via statement lines.\n'
+    #          'For bank journal, we write to the outstanding account specified in this payment method.\n'
+    #          'Only cash and bank journals are allowed.')
     
     @api.depends('type')
     def _compute_hide_use_payment_terminal(self):
