@@ -17,10 +17,10 @@
     "depends": ["base_automation", "sale_management", "pos_longpolling"],
     "external_dependencies": {"python": [], "bin": []},
     "data": [
-        "data.xml",
+        "data/data.xml",
         "actions/base_action_rules.xml",
         "report/report.xml",
-        "view.xml",
+        "views/view.xml",
     ],
     "qweb": ["static/src/xml/pos.xml"],
     "demo": [],

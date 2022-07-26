@@ -1,58 +1,25 @@
-# Translation of Odoo Server.
-# This file contains the translation of the following modules:
-# * pos_invoice_pay
-#
-# Translators:
-# charles paul requena palomino <rcharles84@gmail.com>, 2018
-# Gustavo Valverde, 2018
-# Alexandr Frrost <alexandr.frrost@gmail.com>, 2018
-msgid ""
-msgstr ""
-"Project-Id-Version: Odoo Server 10.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-27 23:49+0000\n"
-"PO-Revision-Date: 2018-04-27 23:49+0000\n"
-"Last-Translator: Alexandr Frrost <alexandr.frrost@gmail.com>, 2018\n"
-"Language-Team: Spanish (https://www.transifex.com/it-projects-llc/"
-"teams/76080/es/)\n"
-"Language: es\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#. module: pos_invoice_pay
-#. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/test_pos_invoice.js:13
-#, python-format
-msgid ""
-"<p>Click to start the point of sale interface. It <b>runs on tablets</b>, "
-"laptops, or industrial hardware.</p><p>Once the session launched, the system "
-"continues to run without an internet connection.</p>"
-msgstr ""
-
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.pos_invoice_pay_report
 msgid "<strong>Total:</strong>"
-msgstr ""
+msgstr "<strong>Total:</strong>"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:70
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Account"
 msgstr "Cuenta"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:75
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Amount"
-msgstr "Monto"
+msgstr "Importe"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:191
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Amount Due"
 msgstr "Monto adeudado"
@@ -70,26 +37,19 @@ msgstr ""
 #. module: pos_invoice_pay
 #: model:ir.model.fields,help:pos_invoice_pay.field_pos_config__sale_order_cashier_selection
 msgid "Ask for a cashier when fetch orders"
-msgstr ""
+msgstr "Pedir un cajero cuando vaya a buscar pedidos"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:212
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Back"
-msgstr "Atras"
+msgstr "Atrás"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:890
-#, python-format
-msgid "Can't validate selected invoice."
-msgstr ""
-
-#. module: pos_invoice_pay
-#. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:102
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:162
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Cancel"
 msgstr "Cancelar"
@@ -102,54 +62,60 @@ msgstr "Cajero"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:284
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Change"
-msgstr ""
+msgstr "Cambiar"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:526
-#: code:addons/pos_invoice_pay/static/src/js/main.js:554
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
 #, python-format
 msgid "Change Cashier"
 msgstr "Cambiar Cajero"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:340
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:422
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:531
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Change:"
-msgstr "Cambio"
+msgstr "Cambio:"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/test_pos_invoice.js:46
+#: code:addons/pos_invoice_pay/static/src/js/test_pos_invoice.js:0
 #, python-format
 msgid "Click the payment method"
-msgstr ""
+msgstr "Haga <b>Click</b> en el metodo de pago"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:110
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Create Invoice"
 msgstr "Crear Factura"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:125
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:185
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.pos_invoice_pay_report
 #, python-format
 msgid "Customer"
 msgstr "Cliente"
 
 #. module: pos_invoice_pay
+#: code:addons/pos_invoice_pay/models/models.py:0
+#, python-format
+msgid "Customer Invoice"
+msgstr "Facturas de Cliente"
+
+#. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:124
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Date"
 msgstr "Fecha"
@@ -157,118 +123,116 @@ msgstr "Fecha"
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_account_payment__datetime
 msgid "Datetime"
-msgstr ""
+msgstr "Fecha/Hora"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:37
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Delivered"
 msgstr "Entregado"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:35
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:69
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Description"
-msgstr "Descripcion"
+msgstr "Descripción"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_pos_config__pos_invoice_pay_writeoff_account_id
 msgid "Difference Account"
-msgstr ""
+msgstr "Cuenta de Diferencia"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:41
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:74
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Discount(%)"
 msgstr "Descuento(%)"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:282
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Due"
-msgstr "Deuda"
+msgstr "Adeudado"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:189
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Due Date"
-msgstr "Fecha deuda"
+msgstr "Fecha Vencimiento"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:889
-#, python-format
-msgid "Error"
-msgstr "Error"
-
-#. module: pos_invoice_pay
-#. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:1041
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
 #, python-format
 msgid "Excessive payment amount."
-msgstr ""
+msgstr "Monto de pago excesivo"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:16
-#, fuzzy, python-format
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#, python-format
 msgid "Fetch Invoices"
-msgstr "Factura"
+msgstr "Facturas"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:10
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Fetch Orders"
-msgstr ""
+msgstr "Ordenes"
 
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.view_pos_config_form
 msgid "Fetch and pay regular invoices"
-msgstr ""
+msgstr "Buscar y pagar facturas periodicas"
 
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.view_pos_config_form
 msgid "Fetch and pay sale orders"
-msgstr ""
+msgstr "Buscar y pagar ordenes de venta"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:239
-#: model:ir.model,name:pos_invoice_pay.model_account_invoice
-#, python-format
-msgid "Invoice"
-msgstr "Factura"
-
-#. module: pos_invoice_pay
-#. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:186
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Invoice Date"
-msgstr ""
+msgstr "Fecha Factura"
 
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.pos_invoice_pay_report
 msgid "Invoice No"
-msgstr ""
-
-#. module: pos_invoice_pay
-#: code:addons/pos_invoice_pay/models.py:181
-#: model:ir.model.fields,field_description:pos_invoice_pay.field_pos_session__session_payments
-#, fuzzy, python-format
-msgid "Invoice Payments"
-msgstr "Factura"
+msgstr "Factura No"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:38
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#, python-format
+msgid "Invoice Payment"
+msgstr "Pago de Factura"
+
+#. module: pos_invoice_pay
+#: code:addons/pos_invoice_pay/models/models.py:0
+#: model:ir.model.fields,field_description:pos_invoice_pay.field_pos_session__session_payments
+#, python-format
+msgid "Invoice Payments"
+msgstr "Pago de Facturas"
+
+#. module: pos_invoice_pay
+#: code:addons/pos_invoice_pay/models/models.py:0
+#, python-format
+msgid "Invoice payment for %s (%s) using %s"
+msgstr "Pago Factura para %s (%s) usando %s"
+
+#. module: pos_invoice_pay
+#. openerp-web
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Invoiced"
 msgstr "Facturado"
@@ -276,55 +240,60 @@ msgstr "Facturado"
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_pos_session__session_invoices_total
 msgid "Invoices"
-msgstr ""
+msgstr "Facturas"
+
+#. module: pos_invoice_pay
+#: model:ir.model,name:pos_invoice_pay.model_account_move
+msgid "Journal Entries"
+msgstr "Asientos contables"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:285
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Method"
-msgstr ""
+msgstr "Método"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:341
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Next Order"
-msgstr ""
+msgstr "Siguiente Orden"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:740
-#: code:addons/pos_invoice_pay/static/src/js/main.js:899
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
 #, python-format
 msgid "No invoice"
-msgstr ""
+msgstr "Sin Factura"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:187
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Number"
-msgstr ""
+msgstr "Número"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:250
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Open Cashbox"
-msgstr ""
+msgstr "Abrir Caja"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:123
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Order"
-msgstr ""
+msgstr "Orden"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_account_payment__pos_session_id
 msgid "POS session"
-msgstr ""
+msgstr "sesion POS"
 
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.pos_invoice_pay_report
@@ -334,63 +303,76 @@ msgstr "Pagada"
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.pos_invoice_pay_report
 msgid "Paid Orders/Invoices"
+msgstr "Pagado Ordernes/Facturas"
+
+#. module: pos_invoice_pay
+#. openerp-web
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
+#, python-format
+msgid ""
+"Para realizar pagos usted necesita seleccionar un metodo de pago que NO sea "
+"de Credito."
 msgstr ""
 
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.view_pos_config_form
 msgid "Pay Sale Orders &amp; Invoices"
-msgstr ""
-
-#. module: pos_invoice_pay
-#. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:215
-#, python-format
-msgid "Payment"
-msgstr ""
+msgstr "Pagar órdenes de venta &amp; Facturas"
 
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.pos_invoice_pay_report
 msgid "Payment Method"
-msgstr ""
+msgstr "Metodo de Pago"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:362
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:477
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Payment of Invoice:"
-msgstr ""
+msgstr "Pago Factura:"
 
 #. module: pos_invoice_pay
 #: model:ir.model,name:pos_invoice_pay.model_account_payment
 msgid "Payments"
-msgstr ""
+msgstr "Pagos"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:369
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Phone:"
-msgstr ""
+msgstr "Tel:"
+
+#. module: pos_invoice_pay
+#: code:addons/pos_invoice_pay/models/models.py:0
+#, python-format
+msgid "Please provide a partner for the sale."
+msgstr "Por favor indique un Asociado para la venta."
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:265
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Please select a payment method."
-msgstr ""
+msgstr "<b>Por favor seleccione un método de pago.</b>"
+
+#. module: pos_invoice_pay
+#. openerp-web
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
+#, python-format
+msgid "Please select the diferent Pyment Method"
+msgstr "Por favor seleccione un método de pago diferente"
 
 #. module: pos_invoice_pay
 #: model:ir.model,name:pos_invoice_pay.model_pos_config
-#, fuzzy
 msgid "Point of Sale Configuration"
-msgstr "Órdenes del Punto de Venta"
+msgstr "Configuración del Punto de Venta"
 
 #. module: pos_invoice_pay
 #: model:ir.model,name:pos_invoice_pay.model_report_point_of_sale_report_saledetails
-#, fuzzy
 msgid "Point of Sale Details"
-msgstr "Órdenes del Punto de Venta"
+msgstr "Detalles del Punto de Venta"
 
 #. module: pos_invoice_pay
 #: model:ir.model,name:pos_invoice_pay.model_pos_order
@@ -398,218 +380,226 @@ msgid "Point of Sale Orders"
 msgstr "Órdenes del Punto de Venta"
 
 #. module: pos_invoice_pay
+#: model:ir.model,name:pos_invoice_pay.model_pos_payment
+msgid "Point of Sale Payments"
+msgstr "Pagos en punto de venta"
+
+#. module: pos_invoice_pay
 #: model:ir.model,name:pos_invoice_pay.model_pos_session
-#, fuzzy
 msgid "Point of Sale Session"
-msgstr "Órdenes del Punto de Venta"
+msgstr "Sesión del Punto de Venta"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:348
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Print Receipt"
-msgstr ""
+msgstr "Imprimir Recibo"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:34
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:68
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Product"
 msgstr "Producto"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:36
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Qty"
-msgstr ""
+msgstr "Ctdad"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:71
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Quantity"
 msgstr "Cantidad"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/test_pos_invoice.js:72
-#: code:addons/pos_invoice_pay/static/src/js/test_pos_invoice.js:77
+#: code:addons/pos_invoice_pay/static/src/js/test_pos_invoice.js:0
+#: code:addons/pos_invoice_pay/static/src/js/test_pos_invoice.js:0
 #, python-format
 msgid "Ready to launch your <b>point of sale</b>? <i>Click here</i>."
-msgstr ""
+msgstr "Listo para poner en marcha <b>tu punto de venta </b>? <i>Click Aqui</>."
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:173
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Register Payment"
-msgstr ""
+msgstr "Registrar pago"
 
 #. module: pos_invoice_pay
 #: model:ir.model,name:pos_invoice_pay.model_sale_order
-#, fuzzy
-msgid "Sale Order"
-msgstr "Órdenes del Punto de Venta"
+msgid "Sales Order"
+msgstr "Ordenes de Venta"
 
 #. module: pos_invoice_pay
 #: model_terms:ir.ui.view,arch_db:pos_invoice_pay.pos_invoice_pay_report
 msgid "Sales Order(origin)"
-msgstr ""
+msgstr "Orden de venta(Origen)"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:126
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:188
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Salesperson"
 msgstr "Vendedor"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:166
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Search Invoices"
-msgstr ""
+msgstr "Buscar Facturas"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:106
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Search Sale Orders"
-msgstr ""
+msgstr "Buscar Orden Venta"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_pos_config__invoice_cashier_selection
 msgid "Select Invoice Cashier"
-msgstr ""
+msgstr "Seleccionar cajero de Facturas"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_pos_config__sale_order_cashier_selection
 msgid "Select Sale Order Cashier"
-msgstr ""
+msgstr "Seleccionar cajero de orden de venta"
+
+#. module: pos_invoice_pay
+#. openerp-web
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
+#, python-format
+msgid "Select amount"
+msgstr "Seleccionar Cantidad"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_pos_config__show_invoices
-#, fuzzy
 msgid "Show Invoices"
-msgstr "Factura"
+msgstr "Ver Facturas"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,field_description:pos_invoice_pay.field_pos_config__show_sale_orders
-#, fuzzy
 msgid "Show Sale Orders"
-msgstr "Órdenes del Punto de Venta"
+msgstr "Ver Ordens de Venta"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,help:pos_invoice_pay.field_pos_config__show_invoices
 msgid "Show invoices in POS"
-msgstr ""
+msgstr "Ver Facturas en POS"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,help:pos_invoice_pay.field_pos_session__session_payments
 msgid "Show invoices paid in the Session"
-msgstr ""
+msgstr "Ver Facturas pagadas en la sesión"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,help:pos_invoice_pay.field_pos_config__show_sale_orders
 msgid "Show sale orders in POS"
-msgstr ""
+msgstr "Ver Ordenes de venta en POS"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:128
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:192
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Status"
-msgstr "Estatus"
+msgstr "Estado"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:42
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Subtotal"
 msgstr "Subtotal"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:381
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:487
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Subtotal:"
-msgstr ""
+msgstr "Subtotal"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:387
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:493
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Tax:"
-msgstr ""
+msgstr "Impuesto"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:40
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:73
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Taxes"
 msgstr "Impuestos"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:452
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Tel:"
-msgstr ""
+msgstr "Tel.:"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:283
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Tendered"
-msgstr ""
+msgstr "Ofertado"
 
 #. module: pos_invoice_pay
 #: model:ir.model.fields,help:pos_invoice_pay.field_pos_config__pos_invoice_pay_writeoff_account_id
 msgid "The account is used for the difference between due and paid amount"
-msgstr ""
+msgstr "La cuenta se utliza para la diferencia entre la cantidad adeudada y la pagada"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:741
-#: code:addons/pos_invoice_pay/static/src/js/main.js:900
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
 #, python-format
 msgid "There must be invoice selected."
-msgstr ""
+msgstr "Debe haber una factura seleccionada"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:245
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Tip"
-msgstr ""
+msgstr "Propina"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:127
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:190
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Total"
 msgstr "Total"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:401
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:509
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Total:"
-msgstr ""
+msgstr "Total"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:39
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:72
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Unit Price"
 msgstr "Precio Unitario"
@@ -617,75 +607,71 @@ msgstr "Precio Unitario"
 #. module: pos_invoice_pay
 #: model:base.automation,name:pos_invoice_pay.invoice_update_pos_action
 #: model:ir.actions.server,name:pos_invoice_pay.invoice_update_pos_action_ir_actions_server
-#, fuzzy
 msgid "Update Invoices"
-msgstr "Factura"
+msgstr "Actualizar Facturas"
 
 #. module: pos_invoice_pay
 #: model:base.automation,name:pos_invoice_pay.so_update_pos_action
 #: model:ir.actions.server,name:pos_invoice_pay.so_update_pos_action_ir_actions_server
-#, fuzzy
 msgid "Update Sale Order"
-msgstr "Órdenes del Punto de Venta"
+msgstr "Actualizar Orden de Venta"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:370
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:472
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "User:"
-msgstr ""
+msgstr "Usuario:"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:455
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "VAT:"
 msgstr ""
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:216
+#: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Validate"
-msgstr ""
+msgstr "Validar"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:1063
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
 #, python-format
 msgid "Wrong payment amount."
-msgstr ""
+msgstr "Cantidad de pago incorrecta"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:1042
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
 #, python-format
 msgid ""
 "You can not validate the order with a change because difference account is "
 "not set. Please enter the exact payment amount."
-msgstr ""
+msgstr "No puede validar el pedido con un cambio porque no se ha configurado"
+    "una cuenta diferente. <b>Ingrese el monto exacto del pago.</b>"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:1056
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
 #, python-format
 msgid "You can not validate the order with zero payment amount."
-msgstr ""
+msgstr "No se puede validar la orden con una cantidad de pago: $0"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:1064
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
 #, python-format
 msgid "You can only create positive payments."
-msgstr ""
+msgstr "Solo se pueden crear pagos positivos"
 
 #. module: pos_invoice_pay
 #. openerp-web
-#: code:addons/pos_invoice_pay/static/src/js/main.js:1055
+#: code:addons/pos_invoice_pay/static/src/js/main.js:0
 #, python-format
 msgid "Zero payment amount."
-msgstr ""
-
-#~ msgid "pos.config"
-#~ msgstr "pos.config"
+msgstr "Cantidad de pago cero: $0"

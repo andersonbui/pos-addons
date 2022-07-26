@@ -3,6 +3,7 @@
 # License MIT (https://opensource.org/licenses/MIT).
 
 from functools import reduce
+from pyexpat import model
 import psycopg2
 import logging
 from odoo import _, api, fields, models, tools
@@ -94,8 +95,8 @@ class PosOrder(models.Model):
             order['user_id'] = pos_order.user_id.id
             pos_order.write(self._order_fields(order))
 
-        pos_order = pos_order.with_company(pos_order.company_id)
-        self = self.with_company(pos_order.company_id)
+        pos_order = pos_order.with_company2(pos_order.company_id)
+        self = self.with_company2(pos_order.company_id)
         self._process_payment_lines(order, pos_order, pos_session, draft)
 
         if not draft:
@@ -158,6 +159,46 @@ class PosOrder(models.Model):
             inv_id.sudo().with_context(force_company=order.company_id.id).action_post()
             # inv_id.sudo().with_context(force_company=order.company_id.id).post()
         return inv_id.id
+
+
+    def _apply_invoice_payments(self):
+        receivable_account = self.env["res.partner"]._find_accounting_partner(self.partner_id).property_account_receivable_id
+        payment_moves = self.payment_ids._create_payment_moves()
+        invoice_receivable = self.account_move.line_ids.filtered(lambda line: line.account_id == receivable_account)
+        # Reconcile the invoice to the created payment moves.
+        # But not when the invoice's total amount is zero because it's already reconciled.
+        if not invoice_receivable.reconciled and receivable_account.reconcile:
+            payment_receivables = payment_moves.mapped('line_ids').filtered(lambda line: line.account_id == receivable_account)
+            (invoice_receivable | payment_receivables).reconcile()
+
+    def with_company2(self, company):
+        """ with_company2(company)
+        Return a new version of this recordset with a modified context, such that::
+            result.env.company = company
+            result.env.companies = self.env.companies | company
+        :param company: main company of the new environment.
+        :type company: :class:`~odoo.addons.base.models.res_company` or int
+        .. warning::
+            When using an unauthorized company for current user,
+            accessing the company(ies) on the environment may trigger
+            an AccessError if not done in a sudoed environment.
+        """
+        if not company:
+            # With company = None/False/0/[]/empty recordset: keep current environment
+            return self
+
+        company_id = int(company)
+        allowed_company_ids = self.env.context.get('allowed_company_ids', [])
+        if allowed_company_ids and company_id == allowed_company_ids[0]:
+            return self
+        # Copy the allowed_company_ids list
+        # to avoid modifying the context of the current environment.
+        allowed_company_ids = list(allowed_company_ids)
+        if company_id in allowed_company_ids:
+            allowed_company_ids.remove(company_id)
+        allowed_company_ids.insert(0, company_id)
+
+        return self.with_context(allowed_company_ids=allowed_company_ids)
 
 
 class AccountPayment(models.Model):
@@ -307,3 +348,40 @@ class PosSession(models.Model):
             "view_type": "form",
             "view_mode": "tree,form",
         }
+
+    class PostPayment(models.Model):
+        _inherit = "pos.payment"
+
+        def _create_payment_moves(self):
+            result = self.env['account.move']
+            for payment in self:
+                order = payment.pos_order_id
+                payment_method = payment.payment_method_id
+                if payment_method.type == 'pay_later' or float_is_zero(payment.amount, precision_rounding=order.currency_id.rounding):
+                    continue
+                accounting_partner = self.env["res.partner"]._find_accounting_partner(payment.partner_id)
+                pos_session = order.session_id
+                journal = pos_session.config_id.journal_id
+                payment_move = self.env['account.move'].with_context(default_journal_id=journal.id).create({
+                    'journal_id': journal.id,
+                    'date': fields.Date.context_today(payment),
+                    'ref': _('Invoice payment for %s (%s) using %s') % (order.name, order.account_move.name, payment_method.name),
+                    'pos_payment_ids': payment.ids,
+                })
+                result |= payment_move
+                payment.write({'account_move_id': payment_move.id})
+                amounts = pos_session._update_amounts({'amount': 0, 'amount_converted': 0}, {'amount': payment.amount}, payment.payment_date)
+                credit_line_vals = pos_session._credit_amounts({
+                    'account_id': accounting_partner.property_account_receivable_id.id,
+                    'partner_id': accounting_partner.id,
+                    'move_id': payment_move.id,
+                }, amounts['amount'], amounts['amount_converted'])
+                debit_line_vals = pos_session._debit_amounts({
+                    'account_id': pos_session.company_id.account_default_pos_receivable_account_id.id,
+                    'move_id': payment_move.id,
+                }, amounts['amount'], amounts['amount_converted'])
+                self.env['account.move.line'].with_context(check_move_validity=False).create([credit_line_vals, debit_line_vals])
+                payment_move.post()
+            return result
+
+    
