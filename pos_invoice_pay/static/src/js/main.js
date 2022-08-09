@@ -67,6 +67,46 @@ odoo.define("pos_invoices", function (require) {
     });
 
     models.load_models({
+        model:  'product.product',
+        fields: ['display_name', 'lst_price', 'standard_price', 'categ_id', 'pos_categ_id', 'taxes_id',
+                 'barcode', 'default_code', 'to_weight', 'uom_id', 'description_sale', 'description',
+                 'product_tmpl_id','tracking'],
+        order:  _.map(['sequence','default_code','name'], function (name) { return {name: name}; }),
+        domain: function(self){
+            var domain = ['&', '&', ['sale_ok','=',true],['available_in_pos','=',false],'|',['company_id','=',self.config.company_id[0]],['company_id','=',false]];
+            if (self.config.limit_categories &&  self.config.iface_available_categ_ids.length) {
+                domain.unshift('&');
+                domain.push(['pos_categ_id', 'in', self.config.iface_available_categ_ids]);
+            }
+            if (self.config.iface_tipproduct){
+              domain.unshift(['id', '=', self.config.tip_product_id[0]]);
+              domain.unshift('|');
+            }
+            return domain;
+        },
+        context: function(self){ return { display_default_code: false }; },
+        loaded: function(self, products){
+            var using_company_currency = self.config.currency_id[0] === self.company.currency_id[0];
+            var conversion_rate = self.currency.rate / self.company_currency.rate;
+            var lista_obj_products=_.map(products, function (product) {
+                if (!using_company_currency) {
+                    product.lst_price = round_pr(product.lst_price * conversion_rate, self.currency.rounding);
+                }
+                product.categ = _.findWhere(self.product_categories, {'id': product.categ_id[0]});
+                product.pos = self;
+                return new models.Product({}, product);
+            });
+            self.db.products_no_availables = lista_obj_products
+            self.db.products_no_availables_by_id = {}
+            
+            for(var i = 0, len = lista_obj_products.length; i < len; i++){
+                var product = lista_obj_products[i]; 
+                self.db.products_no_availables_by_id[product.id] = product;
+            }
+        },
+
+    });
+    models.load_models({
         model: "account.move",
         fields: [
             "name",
@@ -727,7 +767,7 @@ odoo.define("pos_invoices", function (require) {
         },
         
         order_action: function(order_data, action) {
-            if (this.old_order !== null) {
+            if (this.old_order !== null || _.isUndefined(order_data)) {
                 this.gui.back();
             }
             var order = this.load_order_from_data(order_data, action);
@@ -765,6 +805,11 @@ odoo.define("pos_invoices", function (require) {
                     pos: this.pos,
                 }
             );
+
+            if (order_data === undefined){
+                alert('Intenta de Nuevo');
+                return false;
+            }
 
             // Get Customer
             if (order_data.partner_id) {
@@ -896,39 +941,50 @@ odoo.define("pos_invoices", function (require) {
                 if (line.length === 3) {
                     line = line[2];
                 }
+
                 var product = self.pos.db.get_product_by_id(line.product_id[0]);
-                // Check if product are available in pos
-                if (_.isUndefined(product)) {
-                    self.unknown_products.push(String(line.product_id));
-                } else {
-                    // Create a new order line
-                    order.add_product(
-                        product,
-                        self._prepare_product_options_from_orderline_data(
-                            order,
-                            line,
-                            action
-                        )
-                    );
-                    // Restore lot information.
-                    if (["return"].indexOf(action) !== -1) {
-                        var orderline = order.get_selected_orderline();
-                        if (orderline.pack_lot_lines) {
-                            _.each(orderline.return_pack_lot_names, function(lot_name) {
-                                orderline.pack_lot_lines.add(
-                                    new models.Packlotline(
-                                        {lot_name: lot_name},
-                                        {order_line: orderline}
-                                    )
-                                );
-                            });
-                            orderline.trigger("change", orderline);
-                        }
-                    }
-                }
+
+                if(_.isUndefined(product)){
+                    product = self.pos.db.products_no_availables_by_id[line.product_id[0]];                    
+
+                } 
+                self.get_product_product(product, order, action, line);
             });
         },
-        
+     
+        get_product_product: function (product, order, action, line) {
+            let self = this          
+            // Check if product are available in pos
+            if (_.isUndefined(product)) {
+                self.unknown_products.push(String(line.product_id));
+            } else {
+                // Create a new order line
+                order.add_product(
+                    product,
+                    self._prepare_product_options_from_orderline_data(
+                        order,
+                        line,
+                        action
+                    )
+                );
+                // Restore lot information.
+                if (["return"].indexOf(action) !== -1) {
+                    var orderline = order.get_selected_orderline();
+                    if (orderline.pack_lot_lines) {
+                        _.each(orderline.return_pack_lot_names, function(lot_name) {
+                            orderline.pack_lot_lines.add(
+                                new models.Packlotline(
+                                    {lot_name: lot_name},
+                                    {order_line: orderline}
+                                )
+                            );
+                        });
+                        orderline.trigger("change", orderline);
+                    }
+                }
+            }
+        },
+
         render_header: function () {
             var $header = document.createElement("thead");
             $header.innerHTML = QWeb.render(this.linesHeaderTemplate);
