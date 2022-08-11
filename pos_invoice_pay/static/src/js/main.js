@@ -531,8 +531,11 @@ odoo.define("pos_invoices", function (require) {
         },
 
         update_invoice_db: function (updated_invoice) {
+            if(!updated_invoice) {
+                return;
+            }
             for (var i = 0; i < this.invoices.length; i++) {
-                if (updated_invoice && this.invoices[i].id === updated_invoice.id) {
+                if (this.invoices[i].id === updated_invoice.id) {
                     this.invoices.splice(i, 1);
                     break;
                 }
@@ -914,7 +917,7 @@ odoo.define("pos_invoices", function (require) {
             var skip_screen_state = this.pos.config.iface_print_skip_screen;
             // Disable temporarily skip screen if set
             this.pos.config.iface_print_skip_screen = false;
-            this.gui.show_screen("receipt");
+            this.gui.show_screen("sale_order_receipt");
             this.pos.reloaded_order = false;
             // Set skip screen to whatever previous state
             this.pos.config.iface_print_skip_screen = skip_screen_state;
@@ -1496,6 +1499,15 @@ odoo.define("pos_invoices", function (require) {
     });
 
     gui.define_screen({name: "invoice_payment", widget: InvoicePayment});
+
+    var SaleOrderReceiptScreenWidget = screens.ReceiptScreenWidget.extend({
+        click_next: function() {
+            this.gui.show_screen(this.gui.startup_screen);
+            return this._super();
+        },
+    });
+
+    gui.define_screen({name: "sale_order_receipt", widget: SaleOrderReceiptScreenWidget});
 
     var InvoiceReceiptScreenWidget = screens.ReceiptScreenWidget.extend({
         template: "InvoiceReceiptScreenWidget",
