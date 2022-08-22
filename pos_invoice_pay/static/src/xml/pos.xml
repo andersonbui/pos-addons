@@ -35,6 +35,14 @@
             <td>
                 <t t-esc='item.invoice_status' />
             </td>
+            <td name="td_ol_reprint"  >
+                <span                        
+                    class="button order-list-reprint"                                                
+                    title="Print a duplicate for this order" 
+                    t-att-data-order-id="item.id">
+                    <i class='fa fa-fw fa-print' />
+                </span>
+            </td>
         </tr>
     </t>
     <t t-name="SaleOrderLinesHeader">
@@ -166,6 +174,7 @@
                                                 <th>Salesperson</th>
                                                 <th>Total</th>
                                                 <th>Status</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody class='list-contents'>
