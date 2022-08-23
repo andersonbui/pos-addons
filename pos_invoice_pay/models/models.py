@@ -72,14 +72,14 @@ class PosOrder(models.Model):
             invoice_to_pay = order_aux["invoice_to_pay"]
             # original_order = self.env['pos.order'].search([('account_move', '=', invoice_to_pay["id"])])
             # total_pay = reduce(lambda x, y: x + y, [x[2]["amount"] for x in statement_ids])
-            total_pay = invoice_to_pay['amount_residual']
-            order_aux['amount_total'] = total_pay
-            order_aux['amount_paid'] = total_pay
-            order_aux['amount_return'] = order_aux['amount_return'] - total_pay
-            order_aux['account_move'] = invoice_to_pay["id"]
-            order_aux['state'] = "invoiced"
-            order_aux['to_invoice'] = True
-            order_aux["partner_id"] = invoice_to_pay['partner_id'][0]
+            # total_pay = invoice_to_pay['amount_residual']
+            # order_aux['amount_total'] = total_pay
+            # order_aux['amount_paid'] = total_pay
+            # order_aux['amount_return'] = order_aux['amount_return'] - total_pay
+            # order_aux['account_move'] = invoice_to_pay["id"]
+            # order_aux['state'] = "invoiced"
+            # order_aux['to_invoice'] = True
+            # order_aux["partner_id"] = invoice_to_pay['partner_id'][0]
             if (existing_order and existing_order.state == 'draft') or not existing_order:
                 order_id = self._process_order(order, draft, existing_order)
                 # original_order = self.env['pos.order'].search([('id', '=', order_id)])                existing_order = existing_order[0]

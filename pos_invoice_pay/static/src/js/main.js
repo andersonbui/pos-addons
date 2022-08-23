@@ -399,6 +399,16 @@ odoo.define("pos_invoices", function (require) {
             if (this.pos.add_itp_data && this.invoice_to_pay) {
                 var data = _super_order.export_as_JSON.apply(this, arguments);
                 data.invoice_to_pay = this.invoice_to_pay;
+                if( this.invoice_to_pay ){
+                    // Si es un pago parcial, asignar factura ya existente
+                    data.to_invoice = true;
+                    data.account_move = this.invoice_to_pay.id;
+                    data.state = 'invoiced';
+                    data.amount_total = data.amount_return;
+                    data.amount_paid = data.amount_return;
+                    data.amount_return = 0;
+                    data.partner_id = this.invoice_to_pay.partner_id[0];
+                }
                 return data;
             }
             return _super_order.export_as_JSON.call(this, arguments);
@@ -1405,7 +1415,7 @@ odoo.define("pos_invoices", function (require) {
                 this.pos.proxy.open_cashbox();
             }
             order.initialize_validation_date();
-            if (order.is_to_invoice()) {
+            if (order.is_to_invoice() || order.invoice_to_pay ) {
                 this.pos.push_order(order).then(function () {
                     self.pos.update_or_fetch_invoice(self.pos.selected_invoice.id);
                     self.gui.show_screen("invoice_receipt");
@@ -1429,7 +1439,7 @@ odoo.define("pos_invoices", function (require) {
 
         validate_order: function (force_validation) {
             var order = this.pos.get_order();
-            var invoice_payment  = this.pos.selected_invoice
+            order.invoice_to_pay = this.pos.selected_invoice
             if (
                 !this.pos.config.pos_invoice_pay_writeoff_account_id &&
                 order.invoice_to_pay &&
