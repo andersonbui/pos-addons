@@ -322,3 +322,47 @@ class PostPayment(models.Model):
             self.env['account.move.line'].with_context(check_move_validity=False).create([credit_line_vals, debit_line_vals])
             payment_move.post()
         return result  
+
+
+class PosPaymentMethod(models.Model):
+    _name = "pos.payment.method"
+    _description = "Point of Sale Payment Methods"
+    _order = "id asc"
+    _inherit = 'pos.payment.method'
+
+    cash_journal_id = fields.Many2one('account.journal',
+        string='Journal',
+        domain=[('type', 'in', ('cash', 'bank'))],
+        ondelete='restrict',
+        help='The payment method is of type cash. A cash statement will be automatically generated.\n'
+             'Leave empty to use the receivable account of customer.\n'
+             'Defines the journal where to book the accumulated payments (or individual payment if Identify Customer is true) after closing the session.\n'
+             'For cash journal, we directly write to the default account in the journal via statement lines.\n'
+             'For bank journal, we write to the outstanding account specified in this payment method.\n'
+             'Only cash and bank journals are allowed.')
+    
+    is_cash_count = fields.Boolean(string='Cash', compute="_compute_is_cash_count", store=True)
+    active = fields.Boolean(default=True)
+    _type = fields.Selection(selection=[('cash', 'Cash'), ('bank', 'Bank'), ('pay_later', 'Customer Account')], compute="_compute_type")
+    hide_use_payment_terminal = fields.Boolean(compute='_compute_hide_use_payment_terminal', help='Technical field which is used to '
+                                               'hide use_payment_terminal when no payment interfaces are installed.')
+                                               
+    @api.depends('_type')
+    def _compute_is_cash_count(self):
+        for pm in self:
+            pm.is_cash_count = pm._type == 'cash'
+    
+
+    @api.depends('cash_journal_id', 'split_transactions')
+    def _compute_type(self):
+        for pm in self:
+            if pm.cash_journal_id.type in {'cash', 'bank'}:
+                pm._type = pm.cash_journal_id.type
+            else:
+                pm._type = 'pay_later'
+
+    @api.depends('_type')
+    def _compute_hide_use_payment_terminal(self):
+        no_terminals = not bool(self._fields['use_payment_terminal'].selection(self))
+        for payment_method in self:
+            payment_method.hide_use_payment_terminal = no_terminals or payment_method._type in ('cash', 'pay_later')

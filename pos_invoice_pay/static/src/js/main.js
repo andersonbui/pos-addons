@@ -1108,9 +1108,10 @@ odoo.define("pos_invoices", function (require) {
                 self.pos
                     .update_or_fetch_invoice(created_invoice_id)
                     .then(function (res) {
-                        self.pos.selected_invoice = self.pos.db.get_invoice_by_id(res);
-                        self.pos.gui.screen_instances.invoice_payment.render_paymentlines();
-                        self.gui.show_screen("invoice_payment", {type: "orders"});
+                        // self.pos.selected_invoice = self.pos.db.get_invoice_by_id(res);
+                        // self.pos.gui.screen_instances.invoice_payment.render_paymentlines();
+                        // self.gui.show_screen("invoice_payment", {type: "orders"});
+                        self.gui.back();
                     });
             });
             // Fail(function(err, errorEvent) {
@@ -1415,7 +1416,7 @@ odoo.define("pos_invoices", function (require) {
                 this.pos.proxy.open_cashbox();
             }
             order.initialize_validation_date();
-            if (order.is_to_invoice() || order.invoice_to_pay ) {
+            if (order.is_to_invoice() ) {
                 this.pos.push_order(order).then(function () {
                     self.pos.update_or_fetch_invoice(self.pos.selected_invoice.id);
                     self.gui.show_screen("invoice_receipt");

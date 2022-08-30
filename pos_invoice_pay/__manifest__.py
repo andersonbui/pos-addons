@@ -21,6 +21,7 @@
         "actions/base_action_rules.xml",
         "report/report.xml",
         "views/view.xml",
+        "views/pos_payment_method_views.xml"
     ],
     "qweb": ["static/src/xml/pos.xml"],
     "demo": [],
