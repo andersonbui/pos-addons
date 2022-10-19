@@ -17,89 +17,6 @@ from odoo.exceptions import ValidationError, UserError
 class PosOrder(models.Model):
     _inherit = 'pos.order'
 
-    @api.model
-    def _process_order(self, order, draft, existing_order):
-        """Create or update an pos.order from a given dictionary.
-
-        :param pos_order: dictionary representing the order.
-        :type pos_order: dict.
-        :param draft: Indicate that the pos_order is not validated yet.
-        :type draft: bool.
-        :param existing_order: order to be updated or False.
-        :type existing_order: pos.order.
-        :returns number pos_order id
-        """
-        order = order['data']
-        pos_session = self.env['pos.session'].browse(order['pos_session_id'])
-        if pos_session.state == 'closing_control' or pos_session.state == 'closed':
-            order['pos_session_id'] = self._get_valid_session(order).id
-
-        pos_order = False
-        if not existing_order:
-            pos_order = self.create(self._order_fields(order))
-        else:
-            pos_order = existing_order
-            pos_order.lines.unlink()
-            order['user_id'] = pos_order.user_id.id
-            pos_order.write(self._order_fields(order))
-
-        pos_order = pos_order.with_company(pos_order.company_id)
-        self = self.with_company(pos_order.company_id)
-        self._process_payment_lines(order, pos_order, pos_session, draft)
-
-        if not draft:
-            try:
-                pos_order.action_pos_order_paid()
-            except psycopg2.DatabaseError:
-                # do not hide transactional errors, the order(s) won't be saved!
-                raise
-            except Exception as e:
-                _logger.error('Could not fully process the POS Order: %s', tools.ustr(e))
-            pos_order._create_order_picking()
-            pos_order._compute_total_cost_in_real_time()
-
-        if pos_order.to_invoice and pos_order.state == 'paid':
-            pos_order.action_pos_order_invoice()
-            
-        return pos_order.id
-
-
-    def _process_payment_lines(self, pos_order, order, pos_session, draft):
-        """Create account.bank.statement.lines from the dictionary given to the parent function.
-
-        If the payment_line is an updated version of an existing one, the existing payment_line will first be
-        removed before making a new one.
-        :param pos_order: dictionary representing the order.
-        :type pos_order: dict.
-        :param order: Order object the payment lines should belong to.
-        :type order: pos.order
-        :param pos_session: PoS session the order was created in.
-        :type pos_session: pos.session
-        :param draft: Indicate that the pos_order is not validated yet.
-        :type draft: bool.
-        """
-        prec_acc = order.pricelist_id.currency_id.decimal_places
-
-        order_bank_statement_lines= self.env['pos.payment'].search([('pos_order_id', '=', order.id)])
-        order_bank_statement_lines.unlink()
-        for payments in pos_order['statement_ids']:
-            order.add_payment(self._payment_fields(order, payments[2]))
-
-        order.amount_paid = sum(order.payment_ids.mapped('amount'))
-
-        if not draft and not float_is_zero(pos_order['amount_return'], prec_acc):
-            cash_payment_method = pos_session.payment_method_ids.filtered('is_cash_count')[:1]
-            if not cash_payment_method:
-                raise UserError(_("No cash statement found for this session. Unable to record returned cash."))
-            return_payment_vals = {
-                'name': _('return'),
-                'pos_order_id': order.id,
-                'amount': -pos_order['amount_return'],
-                'payment_date': fields.Datetime.now(),
-                'payment_method_id': cash_payment_method.id,
-                'is_change': True,
-            }
-            order.add_payment(return_payment_vals)
 
     def _prepare_invoice_lines(self):
         invoice_lines = []
@@ -297,7 +214,8 @@ class PosOrder(models.Model):
         vals = {
             'invoice_payment_ref': self.name,
             'invoice_origin': self.name,
-            'journal_id': self.session_id.config_id.invoice_journal_id.id,
+            #'journal_id': self.session_id.config_id.invoice_journal_id.id,
+            'journal_id': self.session_id.config_id.journal_id.id,
             'type': 'out_invoice' if self.amount_total >= 0 else 'out_refund',
             'ref': self.name,
             'partner_id': self.partner_id.id,

@@ -121,7 +121,8 @@ class StockMove(models.Model):
         self.ensure_one()
         for move_line in self.move_line_ids:
             move_line.qty_done = move_line.product_uom_qty
-        if float_compare(self.product_uom_qty, self.quantity_done, precision_rounding=self.product_uom.rounding) > 0:
+        #if float_compare(self.product_uom_qty, self.quantity_done, precision_rounding=self.product_uom.rounding) > 0:
+        if float_compare(self.product_uom_qty, self.quantity_done, precision_rounding=self.product_uom.rounding) < 0:
             remaining_qty = self.product_uom_qty - self.quantity_done
             ml_vals = self._prepare_move_line_vals()
             ml_vals.update({'qty_done': remaining_qty})
