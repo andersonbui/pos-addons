@@ -527,11 +527,10 @@
                         </td>
                     </tr>
                 </t>
-            </table>
-            <br />
+            </table>            
             <table class='receipt-change'>
                 <tr>
-                    <td>Change:</td>
+                    <td>Change </td>
                     <td class="pos-right-align">
                         <t
                             t-esc="widget.format_currency(order.invoice_to_pay.get_change())"
@@ -539,6 +538,41 @@
                     </td>
                 </tr>
             </table>
+            <br/>
+            
+            <div class="pos-center-align">                
+                    Estado Factura Credito                                                                    
+            </div>
+            <table >
+                <tr>
+                    <td>Saldo Inicial</td>
+                    <td class="pos-right-align">
+                        <t
+                            t-esc="widget.format_currency(order.invoices.amount_total)"
+                        />
+                    </td>
+                </tr>
+                <br/>
+                <tr>
+                    <td>Saldo Anterior</td>
+                    <td class="pos-right-align">
+                        <t
+                            t-esc="widget.format_currency(order.invoices.amount_residual)"
+                        />
+                    </td>
+                </tr>
+                                          
+                <tr>
+                    <td>Saldo Actual</td>
+                    <td class="pos-right-align">
+                        <t
+                            t-esc="widget.format_currency(order.invoices.amount_residual - order.invoice_to_pay.amount_residual)"
+                        />
+                    </td>
+                </tr>
+                                      
+               
+            </table>                        
             <t t-if="receipt.footer">
                 <br />
                 <div style='text-align:center'>

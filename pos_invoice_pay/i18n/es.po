@@ -65,7 +65,7 @@ msgstr "Cajero"
 #: code:addons/pos_invoice_pay/static/src/xml/pos.xml:0
 #, python-format
 msgid "Change"
-msgstr "Cambiar"
+msgstr "Cambio"
 
 #. module: pos_invoice_pay
 #. openerp-web
