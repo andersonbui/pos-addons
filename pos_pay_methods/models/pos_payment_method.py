@@ -18,6 +18,12 @@ class PosPaymentMethod(models.Model):
     _order = "id asc"
     _inherit = 'pos.payment.method'
 
+    outstanding_account_id = fields.Many2one('account.account',
+                                            string='Outstanding Account',
+                                            ondelete='restrict',
+                                            help='Leave empty to use the default account from the company setting.\n'
+                                                'Account used as outstanding account when creating accounting payment records for bank payments.')
+
     cash_journal_id = fields.Many2one('account.journal',
         string='Journal',
         domain=[('type', 'in', ('cash', 'bank'))],
@@ -28,6 +34,11 @@ class PosPaymentMethod(models.Model):
              'For cash journal, we directly write to the default account in the journal via statement lines.\n'
              'For bank journal, we write to the outstanding account specified in this payment method.\n'
              'Only cash and bank journals are allowed.')
+    
+    split_transactions = fields.Boolean(
+        string='Identify Customer',
+        default=False,
+        help='Forces to set a customer when using this payment method and splits the journal entries for each customer. It could slow down the closing process.')
     
     is_cash_count = fields.Boolean(string='Cash', compute="_compute_is_cash_count", store=True)
     active = fields.Boolean(default=True)

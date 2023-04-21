@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--Copyright 2018 Artyom Losev
+    Copyright 2018 Kolushov Alexandr <https://it-projects.info/team/KolushovAlexandr>
+    License MIT (https://opensource.org/licenses/MIT).-->
+<odoo>
+    <template
+        id="assets_backend"
+        name="pos_pay_methods"
+        inherit_id="point_of_sale.assets"
+    >
+        <xpath expr="." position="inside">
+            <!-- <link rel="stylesheet" href="/pos_pay_methods/static/src/css/styles.css" /> -->
+            <!-- <script
+                type="text/javascript"
+                src="/pos_pay_methods/static/src/js/pos_order.js"
+            /> -->
+            <!-- <script
+                type="text/javascript"
+                src="/pos_pay_methods/static/src/js/invoice_receipt_widget.js"
+            />
+            <script
+                type="text/javascript"
+                src="/pos_pay_methods/static/src/js/invoice_payment_widget.js"
+            /> -->
+        </xpath>
+    </template>
+    <!-- <template
+        id="assets_backend_web"
+        name="pos_invoice_backend_assets"
+        inherit_id="web.assets_backend"
+    >
+        <xpath expr="." position="inside">
+            <script
+                type="text/javascript"
+                src="/pos_pay_methods/static/src/js/test_pos_invoice.js"
+            />
+        </xpath>
+    </template> -->
+</odoo>
