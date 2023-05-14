@@ -25,68 +25,21 @@ class PosOrder(models.Model):
         help='')
 
     @api.model
-    def create_from_ui(self, orders, draft=False):
-        invoices_to_pay = [o for o in orders if o.get("data").get("invoice_to_pay")]
-        original_orders = [o for o in orders if o not in invoices_to_pay]
-
-        res = super(PosOrder, self).create_from_ui(original_orders, draft=draft)
-        if invoices_to_pay:
-            self.create_from_ui_aux(invoices_to_pay, draft=draft)
-
-        return res
-
-    @api.model
     def _order_fields(self, ui_order):
+        """
+            Se anaden campos para verificar si es un pago de una factura existente
+            (invoice_to_pay.id) o es una nueva factura.
+        """
         process_line = super(PosOrder, self)._order_fields(ui_order) 
         if 'invoice_to_pay' in (ui_order):
+            # factura existente con id ui_order['invoice_to_pay']['id']
             process_line['invoice_to_pay'] = ui_order['invoice_to_pay']     
             process_line['account_move'] = ui_order['invoice_to_pay']['id']     
-            process_line['state'] = 'invoiced'           
+            process_line['state'] = 'invoiced' # orden ya facturada
         else:
             process_line['invoice_to_pay'] = False
         
         return process_line
-
-    def create_from_ui_aux(self, orders, draft=False):
-        """ Create and update Orders from the frontend PoS application.
-
-        Create new orders and update orders that are in draft status. If an order already exists with a status
-        diferent from 'draft'it will be discareded, otherwise it will be saved to the database. If saved with
-        'draft' status the order can be overwritten later by this function.
-
-        :param orders: dictionary with the orders to be created.
-        :type orders: dict.
-        :param draft: Indicate if the orders are ment to be finalised or temporarily saved.
-        :type draft: bool.
-        :Returns: list -- list of db-ids for the created and updated orders.
-        """
-        order_ids = []
-        for order in orders:
-            existing_order = False
-            if 'server_id' in order['data']:
-                existing_order = self.env['pos.order'].search(
-                    ['|', ('id', '=', order['data']['server_id']), ('pos_reference', '=', order['data']['name'])],
-                    limit=1)
-            order_aux = order['data']
-            # statement_ids = order["statement_ids"]
-            invoice_to_pay = order_aux["invoice_to_pay"]
-            # original_order = self.env['pos.order'].search([('account_move', '=', invoice_to_pay["id"])])
-            # total_pay = reduce(lambda x, y: x + y, [x[2]["amount"] for x in statement_ids])
-            # total_pay = invoice_to_pay['amount_residual']
-            # order_aux['amount_total'] = total_pay
-            # order_aux['amount_paid'] = total_pay
-            # order_aux['amount_return'] = order_aux['amount_return'] - total_pay
-            # order_aux['account_move'] = invoice_to_pay["id"]
-            # order_aux['state'] = "invoiced"
-            # order_aux['to_invoice'] = True
-            # order_aux["partner_id"] = invoice_to_pay['partner_id'][0]
-            if (existing_order and existing_order.state == 'draft') or not existing_order:
-                order_id = self._process_order(order, draft, existing_order)
-                # original_order = self.env['pos.order'].search([('id', '=', order_id)])                existing_order = existing_order[0]
-                # order._apply_invoice_payments()
-                order_ids.append(order_id)
-
-        return self.env['pos.order'].search_read(domain=[('id', 'in', order_ids)], fields = ['id', 'pos_reference'])
 
     @api.model
     def process_invoices_creation(self, sale_order_id):
@@ -98,15 +51,79 @@ class PosOrder(models.Model):
         return inv_id.id
 
 
-    def _apply_invoice_payments(self):
-        receivable_account = self.env["res.partner"]._find_accounting_partner(self.partner_id).property_account_receivable_id
-        payment_moves = self.payment_ids._create_payment_moves()
-        invoice_receivable = self.account_move.line_ids.filtered(lambda line: line.account_id == receivable_account)
-        # Reconcile the invoice to the created payment moves.
-        # But not when the invoice's total amount is zero because it's already reconciled.
-        if not invoice_receivable.reconciled and receivable_account.reconcile:
-            payment_receivables = payment_moves.mapped('line_ids').filtered(lambda line: line.account_id == receivable_account)
-            (invoice_receivable | payment_receivables).reconcile()
+    def action_pos_order_paid(self):
+        if not self._is_pos_order_paid():
+            raise UserError(_("Order %s is not fully paid.") % self.name)
+        if(self.invoice_to_pay):
+            self.write({'state': 'invoiced'})
+        else:
+            self.write({'state': 'paid'})
+        return self.create_picking()
+
+    # @api.model
+    # def create_from_ui(self, orders, draft=False):
+    #     invoices_to_pay = [o for o in orders if o.get("data").get("invoice_to_pay")]
+    #     original_orders = [o for o in orders if o not in invoices_to_pay]
+
+    #     res = super(PosOrder, self).create_from_ui(original_orders, draft=draft)
+    #     if invoices_to_pay:
+    #         self.create_from_ui_aux(invoices_to_pay, draft=draft)
+
+    #     return res
+
+    # def create_from_ui_aux(self, orders, draft=False):
+    #     """ Create and update Orders from the frontend PoS application.
+
+    #     Create new orders and update orders that are in draft status. If an order already exists with a status
+    #     diferent from 'draft'it will be discareded, otherwise it will be saved to the database. If saved with
+    #     'draft' status the order can be overwritten later by this function.
+
+    #     :param orders: dictionary with the orders to be created.
+    #     :type orders: dict.
+    #     :param draft: Indicate if the orders are ment to be finalised or temporarily saved.
+    #     :type draft: bool.
+    #     :Returns: list -- list of db-ids for the created and updated orders.
+    #     """
+    #     order_ids = []
+    #     for order in orders:
+    #         existing_order = False
+    #         if 'server_id' in order['data']:
+    #             existing_order = self.env['pos.order'].search(
+    #                 ['|', ('id', '=', order['data']['server_id']), ('pos_reference', '=', order['data']['name'])],
+    #                 limit=1)
+    #         order_aux = order['data']
+    #         # statement_ids = order["statement_ids"]
+    #         invoice_to_pay = order_aux["invoice_to_pay"]
+    #         # original_order = self.env['pos.order'].search([('account_move', '=', invoice_to_pay["id"])])
+    #         # total_pay = reduce(lambda x, y: x + y, [x[2]["amount"] for x in statement_ids])
+    #         # total_pay = invoice_to_pay['amount_residual']
+    #         # order_aux['amount_total'] = total_pay
+    #         # order_aux['amount_paid'] = total_pay
+    #         # order_aux['amount_return'] = order_aux['amount_return'] - total_pay
+    #         # order_aux['account_move'] = invoice_to_pay["id"]
+    #         # order_aux['state'] = "invoiced"
+    #         # order_aux['to_invoice'] = True
+    #         # order_aux["partner_id"] = invoice_to_pay['partner_id'][0]
+    #         if (existing_order and existing_order.state == 'draft') or not existing_order:
+    #             order_id = self._process_order(order, draft, existing_order)
+    #             # original_order = self.env['pos.order'].search([('id', '=', order_id)])                existing_order = existing_order[0]
+    #             ## aplicar en tiempo real el pago e las facturas sin esperar a cerrar sala
+    #             # order._apply_invoice_payments()
+    #             order_ids.append(order_id)
+    #     return self.env['pos.order'].search_read(domain=[('id', 'in', order_ids)], fields = ['id', 'pos_reference'])
+
+    # def _apply_invoice_payments(self):
+    #     """
+    #         Utilizado para aplicar en tiempo real el pago e las facturas sin esperar a cerrar sala
+    #     """
+    #     receivable_account = self.env["res.partner"]._find_accounting_partner(self.partner_id).property_account_receivable_id
+    #     payment_moves = self.payment_ids._create_payment_moves()
+    #     invoice_receivable = self.account_move.line_ids.filtered(lambda line: line.account_id == receivable_account)
+    #     # Reconcile the invoice to the created payment moves.
+    #     # But not when the invoice's total amount is zero because it's already reconciled.
+    #     if not invoice_receivable.reconciled and receivable_account.reconcile:
+    #         payment_receivables = payment_moves.mapped('line_ids').filtered(lambda line: line.account_id == receivable_account)
+    #         (invoice_receivable | payment_receivables).reconcile()
 
 class AccountPayment(models.Model):
     _inherit = "account.payment"
@@ -259,22 +276,16 @@ class PosSession(models.Model):
 class AccountMove(models.Model):
 
     _inherit = 'account.move'
-    pos_payment_ids = fields.One2many('pos.payment', 'account_move_id')
-
+    # pos_payment_ids = fields.One2many('pos.payment', 'account_move_id')
 
     def _compute_amount(self):
 
         super(AccountMove, self)._compute_amount()        
         for inv in self:            
             if inv.type in ['out_invoice', 'out_refund'] and inv.pos_order_ids and any(s != 'closed' for s in inv.pos_order_ids.mapped('session_id.state')):
-                amount = 0 
-                rounding = 0.0
-                amountTotal = 0
-                amountResidual = 0
-            
                 rounding = inv.pos_order_ids.currency_id.rounding
                 amountResidual = inv.amount_residual
-                amountTotal = inv.amount_total
+                # amountTotal = inv.amount_total
 
                 isPaid = float_is_zero(amountResidual, rounding)
                 if isPaid:
@@ -290,38 +301,38 @@ class PostPayment(models.Model):
 
     account_move_id = fields.Many2one('account.move')
 
-    def _create_payment_moves(self):
-        result = self.env['account.move']
-        for payment in self:
-            order = payment.pos_order_id
-            payment_method = payment.payment_method_id
-            # if payment_method.type == 'pay_later' or float_is_zero(payment.amount, precision_rounding=order.currency_id.rounding):
-            if float_is_zero(payment.amount, precision_rounding=order.currency_id.rounding):
-                continue
-            accounting_partner = self.env["res.partner"]._find_accounting_partner(payment.partner_id)
-            pos_session = order.session_id
-            journal = pos_session.config_id.journal_id
-            payment_move = self.env['account.move'].with_context(default_journal_id=journal.id).create({
-                'journal_id': journal.id,
-                'date': fields.Date.context_today(payment),
-                'ref': _('Invoice payment for %s (%s) using %s') % (order.name, order.account_move.name, payment_method.name),
-                'pos_payment_ids': payment.ids,
-            })
-            result |= payment_move
-            payment.write({'account_move_id': payment_move.id})
-            amounts = pos_session._update_amounts({'amount': 0, 'amount_converted': 0}, {'amount': payment.amount}, payment.payment_date)
-            credit_line_vals = pos_session._credit_amounts({
-                'account_id': accounting_partner.property_account_receivable_id.id,
-                'partner_id': accounting_partner.id,
-                'move_id': payment_move.id,
-            }, amounts['amount'], amounts['amount_converted'])
-            debit_line_vals = pos_session._debit_amounts({
-                'account_id': pos_session.company_id.account_default_pos_receivable_account_id.id,
-                'move_id': payment_move.id,
-            }, amounts['amount'], amounts['amount_converted'])
-            self.env['account.move.line'].with_context(check_move_validity=False).create([credit_line_vals, debit_line_vals])
-            payment_move.post()
-        return result  
+    # def _create_payment_moves(self):
+    #     result = self.env['account.move']
+    #     for payment in self:
+    #         order = payment.pos_order_id
+    #         payment_method = payment.payment_method_id
+    #         # if payment_method.type == 'pay_later' or float_is_zero(payment.amount, precision_rounding=order.currency_id.rounding):
+    #         if float_is_zero(payment.amount, precision_rounding=order.currency_id.rounding):
+    #             continue
+    #         accounting_partner = self.env["res.partner"]._find_accounting_partner(payment.partner_id)
+    #         pos_session = order.session_id
+    #         journal = pos_session.config_id.journal_id
+    #         payment_move = self.env['account.move'].with_context(default_journal_id=journal.id).create({
+    #             'journal_id': journal.id,
+    #             'date': fields.Date.context_today(payment),
+    #             'ref': _('Invoice payment for %s (%s) using %s') % (order.name, order.account_move.name, payment_method.name),
+    #             'pos_payment_ids': payment.ids,
+    #         })
+    #         result |= payment_move
+    #         payment.write({'account_move_id': payment_move.id})
+    #         amounts = pos_session._update_amounts({'amount': 0, 'amount_converted': 0}, {'amount': payment.amount}, payment.payment_date)
+    #         credit_line_vals = pos_session._credit_amounts({
+    #             'account_id': accounting_partner.property_account_receivable_id.id,
+    #             'partner_id': accounting_partner.id,
+    #             'move_id': payment_move.id,
+    #         }, amounts['amount'], amounts['amount_converted'])
+    #         debit_line_vals = pos_session._debit_amounts({
+    #             'account_id': pos_session.company_id.account_default_pos_receivable_account_id.id,
+    #             'move_id': payment_move.id,
+    #         }, amounts['amount'], amounts['amount_converted'])
+    #         self.env['account.move.line'].with_context(check_move_validity=False).create([credit_line_vals, debit_line_vals])
+    #         payment_move.post()
+    #     return result  
 
 
 class PosPaymentMethod(models.Model):
@@ -343,26 +354,26 @@ class PosPaymentMethod(models.Model):
     
     is_cash_count = fields.Boolean(string='Cash', compute="_compute_is_cash_count", store=True)
     active = fields.Boolean(default=True)
-    _type = fields.Selection(selection=[('cash', 'Cash'), ('bank', 'Bank'), ('pay_later', 'Customer Account')], compute="_compute_type")
+    type = fields.Selection(selection=[('cash', 'Cash'), ('bank', 'Bank'), ('pay_later', 'Customer Account')], compute="_compute_type")
     hide_use_payment_terminal = fields.Boolean(compute='_compute_hide_use_payment_terminal', help='Technical field which is used to '
                                                'hide use_payment_terminal when no payment interfaces are installed.')
                                                
-    @api.depends('_type')
+    @api.depends('type')
     def _compute_is_cash_count(self):
         for pm in self:
-            pm.is_cash_count = pm._type == 'cash'
+            pm.is_cash_count = pm.type == 'cash'
     
 
     @api.depends('cash_journal_id', 'split_transactions')
     def _compute_type(self):
         for pm in self:
             if pm.cash_journal_id.type in {'cash', 'bank'}:
-                pm._type = pm.cash_journal_id.type
+                pm.type = pm.cash_journal_id.type
             else:
-                pm._type = 'pay_later'
+                pm.type = 'pay_later'
 
-    @api.depends('_type')
+    @api.depends('type')
     def _compute_hide_use_payment_terminal(self):
         no_terminals = not bool(self._fields['use_payment_terminal'].selection(self))
         for payment_method in self:
-            payment_method.hide_use_payment_terminal = no_terminals or payment_method._type in ('cash', 'pay_later')
+            payment_method.hide_use_payment_terminal = no_terminals or payment_method.type in ('cash', 'pay_later')

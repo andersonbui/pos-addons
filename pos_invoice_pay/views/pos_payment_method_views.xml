@@ -13,7 +13,7 @@
         <field name="arch" type="xml">
 
             <xpath expr="//form/sheet" position="inside">
-                <field name="_type" invisible="1" />
+                <field name="type" invisible="1" />
             </xpath>
             
                         
@@ -38,7 +38,7 @@
                     <field name="split_transactions" groups="base.group_account_user" />                                
                 </group> 
                                             
-                <group attrs="{'invisible': ['|', ('hide_use_payment_terminal', '=', False), ('_type', 'in', ['cash', 'pay_later'])]}">
+                <group attrs="{'invisible': ['|', ('hide_use_payment_terminal', '=', False), ('type', 'in', ['cash', 'pay_later'])]}">
                     <div>
                         <h2>Tips:</h2>
                         <p>
