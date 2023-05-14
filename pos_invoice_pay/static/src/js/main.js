@@ -1408,9 +1408,19 @@ odoo.define("pos_invoices", function (require) {
         },
 
         finalize_validation: function () {
+            var invoices = [];
             var self = this,
                 order = this.pos.get_order();
             order.invoice_to_pay = this.pos.selected_invoice;
+            invoices = order.pos.invoices;
+            order.invoices = [];
+
+            for (let i = 0; i < invoices.length; i++){                
+                if(invoices[i].invoice_origin == order.invoice_to_pay.invoice_origin){
+                    order.invoices = invoices[i];
+                }                
+            };
+
             self.pos.start_invoice_processing();
             if (order.is_paid_with_cash() && this.pos.config.iface_cashdrawer) {
                 this.pos.proxy.open_cashbox();

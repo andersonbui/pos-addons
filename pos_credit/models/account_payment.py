@@ -10,7 +10,8 @@ class AccountPayment(models.Model):
 
     move_id = fields.Many2one(
         comodel_name='account.move',
-        string='Journal Entry', required=True, readonly=True, ondelete='cascade',
+        #string='Journal Entry', required=True, readonly=True, ondelete='cascade',
+        string='Journal Entry', readonly=True, ondelete='cascade',
         check_company=True)
 
 
@@ -28,7 +29,7 @@ class AccountPayment(models.Model):
     force_outstanding_account_id = fields.Many2one("account.account", "Forced Outstanding Account", check_company=True)
     pos_session_id = fields.Many2one('pos.session', "POS Session")
 
-    #ref = fields.Char(string='Reference', copy=False, store=True)
+    ref = fields.Char(string='Reference', copy=False, store=True)
 
     def _get_valid_liquidity_accounts(self):
         result = super()._get_valid_liquidity_accounts()
@@ -50,6 +51,19 @@ class AccountPayment(models.Model):
     def _compute_is_internal_transfer(self):
         for payment in self:
             payment.is_internal_transfer = payment.partner_id and payment.partner_id == payment.journal_id.company_id.partner_id
+    
+
+    # -----------------------------------
+    # BUSINESS METHODS
+    # -----------------------------------
+    def action_post(self):
+        ''' draft -> posted '''
+        #self.move_id._post(soft=False)
+        self.move_id.post()
+
+        self.filtered(
+          lambda pay: pay.is_internal_transfer and not pay.paired_internal_transfer_payment_id
+             )._create_paired_internal_transfer_payment()
 
 
 
@@ -84,22 +98,6 @@ class AccountPayment(models.Model):
             lines = (payment.move_id.line_ids + paired_payment.move_id.line_ids).filtered(
                 lambda l: l.account_id == payment.destination_account_id and not l.reconciled)
             lines.reconcile()
-
-
-
-    # -----------------------------------
-    # BUSINESS METHODS
-    # -----------------------------------
-    def action_post(self):
-        ''' draft -> posted '''
-        #self.move_id._post(soft=False)
-        self.move_id.post()
-
-        self.filtered(
-            lambda pay: pay.is_internal_transfer and not pay.paired_internal_transfer_payment_id
-        )._create_paired_internal_transfer_payment()
-
-
 
     # outstanding_account_id = fields.Many2one(
     #     comodel_name='account.account',

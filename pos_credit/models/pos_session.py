@@ -93,7 +93,7 @@ class PosSession(models.Model):
         combine_inv_payment_receivable_lines = defaultdict(lambda: self.env['account.move.line'])
         split_inv_payment_receivable_lines = defaultdict(lambda: self.env['account.move.line'])
         rounded_globally = self.company_id.tax_calculation_rounding_method == 'round_globally'
-        pos_receivable_account = self.company_id.account_default_pos_receivable_account_id
+        pos_receivable_account = self.company_id.account_default_pos_receivable_account_id # Para bancbanco 07 Nacionales
         
         for order in self.order_ids:
             order_is_invoiced = order.is_invoiced
@@ -117,7 +117,7 @@ class PosSession(models.Model):
                         combine_receivables_cash[payment_method] = self._update_amounts(combine_receivables_cash[payment_method], {'amount': amount}, date)
                     elif is_split_payment and payment_type == 'bank':
                         split_receivables[payment] = self._update_amounts(split_receivables[payment], {'amount': amount}, date)
-                    elif not is_split_payment and payment_type == 'bank':
+                    elif not is_split_payment and payment_type == 'bank': # Para bancobacno
                         combine_receivables[payment_method] = self._update_amounts(combine_receivables[payment_method], {'amount': amount}, date)
 
                     # Create the vals to create the pos receivables that wi*-ll balance the pos receivables from invoice payment moves.
@@ -231,13 +231,13 @@ class PosSession(models.Model):
         payment_to_receivable_lines = {}
         for payment_method, amounts in combine_receivables_bank.items():
             combine_receivable_line = MoveLine.create(self._get_combine_receivable_vals(payment_method, amounts['amount'], amounts['amount_converted']))
-            payment_receivable_line = self._create_combine_account_payment(payment_method, amounts, diff_amount=bank_payment_method_diffs.get(payment_method.id) or 0)
+            payment_receivable_line = self._create_combine_account_payment(payment_method, amounts, diff_amount=bank_payment_method_diffs.get(payment_method.id) or 0) #Crea una nuvea linea de moviemiento para banco
             payment_method_to_receivable_lines[payment_method] = combine_receivable_line | payment_receivable_line
-
+        
         for payment, amounts in split_receivables_bank.items():
             split_receivable_line = MoveLine.create(self._get_split_receivable_vals(payment, amounts['amount'], amounts['amount_converted']))
             payment_receivable_line = self._create_split_account_payment(payment, amounts)
-            payment_to_receivable_lines[payment] = split_receivable_line | payment_receivable_line
+            payment_to_receivable_lines[payment] = split_receivable_line | payment_receivable_line        
 
         for bank_payment_method in self.payment_method_ids.filtered(lambda pm: pm.type == 'bank' and pm.split_transactions):
             self._create_diff_account_move_for_split_payment_method(bank_payment_method, bank_payment_method_diffs.get(bank_payment_method.id) or 0)
@@ -300,7 +300,7 @@ class PosSession(models.Model):
         stock_output_lines = data.get('stock_output_lines')
         payment_method_to_receivable_lines = data.get('payment_method_to_receivable_lines')
         payment_to_receivable_lines = data.get('payment_to_receivable_lines')
-
+        #account:account
         for statement in self.statement_ids:
             if not self.config_id.cash_control:
                 statement.write({'balance_end_real': statement.balance_end})
@@ -353,20 +353,21 @@ class PosSession(models.Model):
     def _create_combine_account_payment(self, payment_method, amounts, diff_amount):
         outstanding_account = payment_method.outstanding_account_id or self.company_id.account_journal_payment_debit_account_id
         destination_account = self._get_receivable_account(payment_method)
-
+        # Variable que lleva la cuenta destino de pago con cuenta diaria Banco
         if float_compare(amounts['amount'], 0, precision_rounding=self.currency_id.rounding) < 0:
             # revert the accounts because account.payment doesn't accept negative amount.
             outstanding_account, destination_account = destination_account, outstanding_account
-
+        method_idd = payment_method.cash_journal_id.inbound_payment_method_ids.ids[0]
         account_payment = self.env['account.payment'].create({
             'payment_type': 'outbound',
-            'payment_method_id': payment_method.id,
+            'payment_method_id': method_idd,
             'amount': abs(amounts['amount']),
             #'journal_id': payment_method.journal_id.id,
             'journal_id': payment_method.cash_journal_id.id,
-            'force_outstanding_account_id': outstanding_account.id,
+            #'force_outstanding_account_id': outstanding_account.id,
+            'force_outstanding_account_id': payment_method.cash_journal_id.id,
             'destination_account_id':  destination_account.id,
-            #'ref': 1,#_('Combine %s POS payments from %s') % (payment_method.name, self.name),            
+            'ref': _('Combine %s POS payments from %s') % (payment_method.name, self.name),            
             'pos_payment_method_id': payment_method.id,
             'pos_session_id': self.id,
         })
@@ -382,4 +383,110 @@ class PosSession(models.Model):
     def _get_receivable_account(self, payment_method):
         """Returns the default pos receivable account if no receivable_account_id is set on the payment method."""
         return payment_method.receivable_account_id or self.company_id.account_default_pos_receivable_account_id
-        
+
+    def _create_diff_account_move_for_split_payment_method(self, payment_method, diff_amount):
+        self.ensure_one()
+
+        get_diff_vals_result = self._get_diff_vals(payment_method.id, diff_amount)
+        if not get_diff_vals_result:
+            return
+
+        source_vals, dest_vals = get_diff_vals_result
+        diff_move = self.env['account.move'].create({
+            'journal_id': payment_method.cash_journal_id.id,
+            'date': fields.Date.context_today(self),
+            'ref': self._get_diff_account_move_ref(payment_method),
+            'line_ids': [Command.create(source_vals), Command.create(dest_vals)]
+        })
+        diff_move.post()
+        # Se utiliza el metodo post odoo V13.
+
+    def _get_diff_vals(self, payment_method_id, diff_amount):
+        payment_method = self.env['pos.payment.method'].browse(payment_method_id)
+        diff_compare_to_zero = self.currency_id.compare_amounts(diff_amount, 0)
+        source_account = payment_method.outstanding_account_id or self.company_id.account_journal_payment_debit_account_id
+        destination_account = self.env['account.account'] # En efectivo no tiene datos
+
+        if (diff_compare_to_zero > 0):
+            destination_account = payment_method.journal_id.profit_account_id
+        elif (diff_compare_to_zero < 0):
+            destination_account = payment_method.journal_id.loss_account_id
+
+        if (diff_compare_to_zero == 0 or not source_account):
+            return False
+
+        amounts = self._update_amounts({'amount': 0, 'amount_converted': 0}, {'amount': diff_amount}, self.stop_at)
+        source_vals = self._debit_amounts({'account_id': source_account.id}, amounts['amount'], amounts['amount_converted'])
+        dest_vals = self._credit_amounts({'account_id': destination_account.id}, amounts['amount'], amounts['amount_converted'])
+        return [source_vals, dest_vals]
+
+    def _get_diff_account_move_ref(self, payment_method):
+        return _('Closing difference in %s (%s)', payment_method.name, self.name)                          
+
+
+##METODOS BANCO TOMADOS DE ODOO V15
+
+    def _create_split_account_payment(self, payment, amounts):
+        payment_method = payment.payment_method_id
+        #if not payment_method.journal_id:
+        if not payment_method.cash_journal_id.id:
+            return self.env['account.move.line']
+        outstanding_account = payment_method.outstanding_account_id or self.company_id.account_journal_payment_debit_account_id
+        accounting_partner = self.env["res.partner"]._find_accounting_partner(payment.partner_id)
+        destination_account = accounting_partner.property_account_receivable_id
+
+        if float_compare(amounts['amount'], 0, precision_rounding=self.currency_id.rounding) < 0:
+            # revert the accounts because account.payment doesn't accept negative amount.
+            outstanding_account, destination_account = destination_account, outstanding_account
+        method_idd = payment_method.cash_journal_id.inbound_payment_method_ids.ids[0]
+    
+        account_payment = self.env['account.payment'].create({
+            #Verificar el valor de la variable payment_type (quemado)
+            'payment_type': 'inbound',
+            #Verificar
+            #payment_method_id': payment_method.id,
+            'payment_method_id': method_idd,
+            'amount': abs(amounts['amount']),
+            'partner_id': payment.partner_id.id,
+            #'journal_id': payment_method.journal_id.id,
+            'journal_id': payment_method.cash_journal_id.id,
+            'force_outstanding_account_id': outstanding_account.id,
+            'destination_account_id': destination_account.id,
+            'ref': _('%s POS payment of %s in %s') % (payment_method.name, payment.partner_id.display_name, self.name),
+            'pos_payment_method_id': payment_method.id,
+            'pos_session_id': self.id,            
+        })
+        account_payment.action_post()
+        return account_payment.move_id.line_ids.filtered(lambda line: line.account_id == account_payment.destination_account_id)
+
+
+    def _create_non_reconciliable_move_lines(self, data):
+        # Create account.move.line records for
+        #   - sales
+        #   - taxes
+        #   - stock expense
+        #   - non-cash split receivables (not for automatic reconciliation)
+        #   - non-cash combine receivables (not for automatic reconciliation)
+        taxes = data.get('taxes')
+        sales = data.get('sales')
+        stock_expense = data.get('stock_expense')
+        split_receivables = data.get('split_receivables')
+        combine_receivables = data.get('combine_receivables')
+        MoveLine = data.get('MoveLine')
+
+        tax_vals = [self._get_tax_vals(key, amounts['amount'], amounts['amount_converted'], amounts['base_amount_converted']) for key, amounts in taxes.items() if amounts['amount']]
+        # Check if all taxes lines have account_id assigned. If not, there are repartition lines of the tax that have no account_id.
+        tax_names_no_account = [line['name'] for line in tax_vals if line['account_id'] == False]
+        if len(tax_names_no_account) > 0:
+            error_message = _(
+                'Unable to close and validate the session.\n'
+                'Please set corresponding tax account in each repartition line of the following taxes: \n%s'
+            ) % ', '.join(tax_names_no_account)
+            raise UserError(error_message)
+
+        MoveLine.create(
+            tax_vals
+            + [self._get_sale_vals(key, amounts['amount'], amounts['amount_converted']) for key, amounts in sales.items()]
+            + [self._get_stock_expense_vals(key, amounts['amount'], amounts['amount_converted']) for key, amounts in stock_expense.items()]            
+        )
+        return data
