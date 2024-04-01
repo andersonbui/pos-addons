@@ -1,0 +1,3 @@
+[build-system]
+split_transactions
+build-backend = "whool.buildapi"
